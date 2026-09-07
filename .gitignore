@@ -69,6 +69,7 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 .idea
+.vscode
 Plugins/Developer
 Builds
 Config/steamvr_ue_editor_app.json
