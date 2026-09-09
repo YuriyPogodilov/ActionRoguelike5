@@ -28,13 +28,13 @@ protected:
 	TObjectPtr<UStaticMeshComponent> MeshComp;
 	
 	UPROPERTY(VisibleAnywhere, Category="Components")
-	TObjectPtr<UNiagaraComponent> BurningEffectComp;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Components")
-	TObjectPtr<UAudioComponent> LoopBurningSoundComp;
-	
-	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<URadialForceComponent> RadialForceComponent;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Burning")
+	TObjectPtr<UNiagaraSystem> BurningEffect;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Burning")
+	TObjectPtr<USoundBase> BurningSound;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Explosion")
 	TObjectPtr<UNiagaraSystem> ExplosionEffect;
@@ -50,4 +50,15 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Explosion")
 	float ExplosionDamage;
+	
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> ActiveBurningEffect = nullptr;
+	
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> ActiveBurningSound = nullptr;
+	
+	FTimerHandle ExplosionTimerHandle;
+	
+	UPROPERTY()
+	bool bExploded{ false };
 };

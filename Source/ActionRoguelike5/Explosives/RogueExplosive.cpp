@@ -12,19 +12,12 @@ ARogueExplosive::ARogueExplosive()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
 	MeshComp->SetSimulatePhysics(true);
-	
-	BurningEffectComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BurningEffect"));
-	BurningEffectComp->SetupAttachment(MeshComp);
-	BurningEffectComp->SetAutoActivate(false);
-	
-	LoopBurningSoundComp = CreateDefaultSubobject<UAudioComponent>(TEXT("LoopBurningSound"));
-	LoopBurningSoundComp->SetupAttachment(MeshComp);
-	LoopBurningSoundComp->SetAutoActivate(false);
+	MeshComp->SetCollisionProfileName("PhysicsActor");
 	
 	RadialForceComponent = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForceComponent"));
 	RadialForceComponent->SetupAttachment(MeshComp);
-	RadialForceComponent->Radius = 300.f;
-	RadialForceComponent->ImpulseStrength = 500000.f;
+	RadialForceComponent->Radius = 500.f;
+	RadialForceComponent->ImpulseStrength = 150000.f;
 	
 	ExplosionDelay = 3.f;
 	ExplosionDamage = 30.f;
@@ -40,20 +33,31 @@ float ARogueExplosive::TakeDamage(float DamageAmount, struct FDamageEvent const&
 
 void ARogueExplosive::StartBurning()
 {
-	BurningEffectComp->Activate();
-	LoopBurningSoundComp->Activate();
+	if (bExploded || GetWorldTimerManager().TimerExists(ExplosionTimerHandle))
+	{
+		return;
+	}
 	
-	FTimerHandle ExplosionTimerHandle;
+	ActiveBurningEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(BurningEffect, MeshComp, NAME_None,
+		FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+	
+	ActiveBurningSound = UGameplayStatics::SpawnSoundAttached(BurningSound, MeshComp);
 	
 	GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &ARogueExplosive::Explode, ExplosionDelay);
 }
 
 void ARogueExplosive::Explode()
 {
+	bExploded = true;
+	
+	ActiveBurningEffect->Deactivate();
+	ActiveBurningSound->Stop();
+	
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ExplosionEffect, GetActorLocation());
 	
 	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation(), FRotator::ZeroRotator);
 	
+	// Apply explosion damage
 	float ExplosionRadius = RadialForceComponent->Radius;
 	
 	TArray<AActor*> IgnoreActors;
@@ -64,6 +68,7 @@ void ARogueExplosive::Explode()
 	
 	RadialForceComponent->FireImpulse();
 	
+	// TODO: instead of destroying the barrel should fly up and change mesh to exploded
 	Destroy();
 }
 
