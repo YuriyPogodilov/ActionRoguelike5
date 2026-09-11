@@ -16,4 +16,8 @@ public:
 	URogueInteractionComponent();
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="Interaction")
+	float InteractionRadius{ 800.f };
 };
