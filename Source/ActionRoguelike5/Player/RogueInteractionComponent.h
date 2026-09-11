@@ -12,12 +12,17 @@ class ACTIONROGUELIKE5_API URogueInteractionComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:
-	URogueInteractionComponent();
-	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Interaction")
 	float InteractionRadius{ 800.f };
+	
+	UPROPERTY()
+	TObjectPtr<AActor> SelectedActor{ nullptr };
+	
+public:
+	void Interact() const;
+	
+	URogueInteractionComponent();
+	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };

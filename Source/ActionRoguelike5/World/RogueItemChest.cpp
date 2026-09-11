@@ -4,23 +4,35 @@
 #include "RogueItemChest.h"
 
 
-// Sets default values
 ARogueItemChest::ARogueItemChest()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-}
-
-// Called when the game starts or when spawned
-void ARogueItemChest::BeginPlay()
-{
-	Super::BeginPlay();
+	PrimaryActorTick.bStartWithTickEnabled = false;
 	
+	BaseMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMeshComp"));
+	BaseMeshComponent->SetCollisionProfileName("Interaction");
+	RootComponent = BaseMeshComponent;
+	
+	LidMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LidMeshComp"));
+	LidMeshComponent->SetCollisionProfileName("NoCollision");
+	LidMeshComponent->SetupAttachment(BaseMeshComponent);
 }
 
-// Called every frame
+void ARogueItemChest::Interact()
+{
+	SetActorTickEnabled(true);
+}
+
 void ARogueItemChest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	CurrentAnimation = FMath::FInterpConstantTo(CurrentAnimation, AnimationTargetPitch, DeltaTime, AnimationSpeed);
+	
+	LidMeshComponent->SetRelativeRotation(FRotator(CurrentAnimation, 0.f, 0.f));
+	
+	if (FMath::IsNearlyEqual(CurrentAnimation, AnimationTargetPitch))
+	{
+		SetActorTickEnabled(false);
+	}
 }
-

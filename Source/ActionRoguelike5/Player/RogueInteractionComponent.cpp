@@ -3,9 +3,21 @@
 
 #include "RogueInteractionComponent.h"
 
+#include "RogueGameTypes.h"
+#include "Core/RogueInteractionInterface.h"
+
 URogueInteractionComponent::URogueInteractionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+}
+
+void URogueInteractionComponent::Interact() const
+{
+	IRogueInteractionInterface* InteractionInterface = Cast<IRogueInteractionInterface>(SelectedActor);
+	if (InteractionInterface)
+	{
+		InteractionInterface->Interact();
+	}
 }
 
 void URogueInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -15,11 +27,9 @@ void URogueInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	APlayerController* PC = CastChecked<APlayerController>(GetOwner());
 	FVector Center = PC->GetPawn()->GetActorLocation();
 	
-	ECollisionChannel CollisionChannel = ECC_Visibility;
+	ECollisionChannel CollisionChannel = COLLISION_INTERACTION;
 	FCollisionShape CollisionShape;
 	CollisionShape.SetSphere(InteractionRadius);
-	
-	DrawDebugSphere(GetWorld(), Center, InteractionRadius, 32, FColor::White);
 	
 	AActor* BestActor = nullptr;
 	float HighestDot = -1.f;
@@ -30,26 +40,27 @@ void URogueInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	for (const FOverlapResult& Overlap : Overlaps)
 	{
 		FVector OverlapLocation = Overlap.GetActor()->GetActorLocation();
-		
-		DrawDebugBox(GetWorld(), OverlapLocation, FVector(40.f), FColor::Red);
-		
 		FVector OverlapDirection = (OverlapLocation - Center).GetSafeNormal();
 		
 		float DotResult = FVector::DotProduct(OverlapDirection, PC->GetControlRotation().Vector());
-		
-		FString DebugDotValue = FString::Printf(TEXT("%0.3f"), DotResult);
-		DrawDebugString(GetWorld(), OverlapLocation, DebugDotValue, nullptr, FColor::White, 0, true);
-		
 		if (DotResult > HighestDot)
 		{
 			BestActor = Overlap.GetActor();
 			HighestDot = DotResult;
 		}
+		
+		FString DebugDotValue = FString::Printf(TEXT("%0.3f"), DotResult);
+		DrawDebugBox(GetWorld(), OverlapLocation, FVector(40.f), FColor::Red);
+		DrawDebugString(GetWorld(), OverlapLocation, DebugDotValue, nullptr, FColor::White, 0, true);
 	}
 	
 	if (BestActor)
 	{
+		SelectedActor = BestActor;
+		
 		DrawDebugBox(GetWorld(), BestActor->GetActorLocation(), FVector(50.f), FColor::Green);
 	}
+	
+	DrawDebugSphere(GetWorld(), Center, InteractionRadius, 32, FColor::White);
 }
 
