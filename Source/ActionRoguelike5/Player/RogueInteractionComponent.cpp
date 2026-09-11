@@ -13,11 +13,7 @@ URogueInteractionComponent::URogueInteractionComponent()
 
 void URogueInteractionComponent::Interact() const
 {
-	IRogueInteractionInterface* InteractionInterface = Cast<IRogueInteractionInterface>(SelectedActor);
-	if (InteractionInterface)
-	{
-		InteractionInterface->Interact();
-	}
+	IRogueInteractionInterface::Execute_Interact(SelectedActor);
 }
 
 void URogueInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -11,13 +11,6 @@ UCLASS()
 class ACTIONROGUELIKE5_API ARogueItemChest : public AActor, public IRogueInteractionInterface
 {
 	GENERATED_BODY()
-
-public:
-	ARogueItemChest();
-	
-	virtual void Tick(float DeltaTime) override;
-	
-	virtual void Interact() override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Components")
@@ -33,4 +26,14 @@ protected:
 	float AnimationTargetPitch{ 120.f };
 	
 	float CurrentAnimation{ 0.f };
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ChestAnimationComplete();
+
+public:
+	ARogueItemChest();
+	
+	virtual void Tick(float DeltaTime) override;
+	
+	virtual void Interact_Implementation() override;
 };
