@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "RogueCharacter.generated.h"
+#include "RoguePlayerCharacter.generated.h"
 
 class UNiagaraSystem;
 class ARogueProjectileMagic;
@@ -17,13 +17,13 @@ class UAnimMontage;
 class USoundBase;
 
 UCLASS()
-class ACTIONROGUELIKE5_API ARogueCharacter : public ACharacter
+class ACTIONROGUELIKE5_API ARoguePlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ARogueCharacter();
+	ARoguePlayerCharacter();
 
 protected:
 	
