@@ -22,6 +22,7 @@ public:
 protected:
 	void StartBurning();
 	
+	UFUNCTION(BlueprintCallable)
 	void Explode();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Components")

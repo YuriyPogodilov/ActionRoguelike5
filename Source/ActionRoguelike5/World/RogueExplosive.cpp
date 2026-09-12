@@ -48,10 +48,21 @@ void ARogueExplosive::StartBurning()
 
 void ARogueExplosive::Explode()
 {
+	if (bExploded)
+	{
+		return;
+	}
+	
 	bExploded = true;
 	
-	ActiveBurningEffect->Deactivate();
-	ActiveBurningSound->Stop();
+	if (ActiveBurningEffect)
+	{
+		ActiveBurningEffect->Deactivate();
+	}
+	if (ActiveBurningSound)
+	{
+		ActiveBurningSound->Stop();
+	}
 	
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ExplosionEffect, GetActorLocation());
 	
@@ -68,7 +79,9 @@ void ARogueExplosive::Explode()
 	
 	RadialForceComponent->FireImpulse();
 	
-	// TODO: instead of destroying the barrel should fly up and change mesh to exploded
-	Destroy();
+	MeshComp->AddImpulse(FVector::UpVector * 1000, NAME_None, true);
+	MeshComp->AddAngularImpulseInDegrees(FVector::RightVector * 1000, NAME_None, true);
+	
+	// TODO: change to exploded barrel
 }
 

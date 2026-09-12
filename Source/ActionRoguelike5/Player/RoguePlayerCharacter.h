@@ -21,10 +21,6 @@ class ACTIONROGUELIKE5_API ARoguePlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-public:
-	// Sets default values for this character's properties
-	ARoguePlayerCharacter();
-
 protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="PrimaryAttack")
@@ -60,23 +56,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
 	
-	// Called when the game starts or when spawned
+public:
+	ARoguePlayerCharacter();
+
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 	
+	virtual void Jump() override;
 	void Move(const FInputActionValue& InValue);
 	void Look(const FInputActionInstance& InValue);
 	
-	void Jump() override;
-	
 	void PrimaryAttack();
-	
 	void AttackTimerElapsed();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 };
