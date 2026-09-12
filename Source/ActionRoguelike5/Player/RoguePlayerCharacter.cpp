@@ -8,8 +8,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Projectiles/RogueProjectileMagic.h"
-
+#include "Projectiles/RogueProjectile.h"
+#include "Abilities/RogueAbilityDataAsset.h"
 
 ARoguePlayerCharacter::ARoguePlayerCharacter()
 {
@@ -21,8 +21,6 @@ ARoguePlayerCharacter::ARoguePlayerCharacter()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
-	
-	MuzzleSocketName = "Muzzle_01";
 }
 
 void ARoguePlayerCharacter::BeginPlay()
@@ -39,9 +37,11 @@ void ARoguePlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	EnhancedInput->BindAction(Input_Move, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::Move);
 	EnhancedInput->BindAction(Input_Look, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::Look);
+	EnhancedInput->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::Jump);
 	
 	EnhancedInput->BindAction(Input_PrimaryAttack, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::PrimaryAttack);
-	EnhancedInput->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::Jump);
+	EnhancedInput->BindAction(Input_SecondaryAttack, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::SecondaryAttack);
+	EnhancedInput->BindAction(Input_Dash, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::Dash);
 }
 
 void ARoguePlayerCharacter::Move(const FInputActionValue& InValue)
@@ -67,43 +67,50 @@ void ARoguePlayerCharacter::Look(const FInputActionInstance& InValue)
 	AddControllerYawInput(InputValue.X);
 }
 
-void ARoguePlayerCharacter::Jump()
+void ARoguePlayerCharacter::CastAbility(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset)
 {
-	Super::Jump();
-}
-
-void ARoguePlayerCharacter::PrimaryAttack()
-{
-	PlayAnimMontage(AttackMontage);
+	const FRogueAbilityData AbilityData = AbilityDataAsset->AbilityData;
 	
-	UNiagaraFunctionLibrary::SpawnSystemAttached(CastingEffect, GetMesh(), MuzzleSocketName, 
+	PlayAnimMontage(AbilityData.AttackMontage);
+	
+	UNiagaraFunctionLibrary::SpawnSystemAttached(AbilityData.CastingEffect, GetMesh(), AbilityData.MuzzleSocketName, 
 		FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::Type::SnapToTarget, true);
 	
-	UGameplayStatics::PlaySound2D(this, CastingSound);
+	UGameplayStatics::PlaySound2D(this, AbilityData.CastingSound);
 	
-	FTimerHandle AttackTimerHandle;
-	const float AttackDelayTime = 0.2f;
+	FTimerHandle AbilityTimerHandle;
+	FTimerDelegate AbilityTimerDelegate;
+	AbilityTimerDelegate.BindUObject(this, &ARoguePlayerCharacter::AbilityTimerElapsed, AbilityDataAsset);
 	
-	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ARoguePlayerCharacter::AttackTimerElapsed, AttackDelayTime);
+	GetWorldTimerManager().SetTimer(AbilityTimerHandle, AbilityTimerDelegate, AbilityData.AnimationDelay, false);
 }
 
-void ARoguePlayerCharacter::AttackTimerElapsed()
+void ARoguePlayerCharacter::AbilityTimerElapsed(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset)
 {
-	FVector SpawnLocation = GetMesh()->GetSocketLocation(MuzzleSocketName);
+	const FRogueAbilityData AbilityData = AbilityDataAsset->AbilityData;
+	
+	FVector SpawnLocation = GetMesh()->GetSocketLocation(AbilityData.MuzzleSocketName);
 	FRotator SpawnRotation = GetControlRotation();
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Instigator = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
-	AActor* NewProjectile = GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	AActor* NewProjectile = GetWorld()->SpawnActor<AActor>(AbilityData.ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
 	
 	MoveIgnoreActorAdd(NewProjectile);
 }
 
-void ARoguePlayerCharacter::Tick(float DeltaTime)
+void ARoguePlayerCharacter::PrimaryAttack()
 {
-	Super::Tick(DeltaTime);
-
+	CastAbility(PrimaryAbilityDataAsset);
 }
 
+void ARoguePlayerCharacter::SecondaryAttack()
+{
+	CastAbility(SecondaryAbilityDataAsset);
+}
 
+void ARoguePlayerCharacter::Dash()
+{
+	CastAbility(DashAbilityDataAsset);
+}

@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "RoguePlayerCharacter.generated.h"
 
+class URogueAbilityDataAsset;
 class UNiagaraSystem;
-class ARogueProjectileMagic;
+class ARogueProjectile;
 struct FInputActionInstance;
 struct FInputActionValue;
 class UInputAction;
@@ -23,32 +25,32 @@ class ACTIONROGUELIKE5_API ARoguePlayerCharacter : public ACharacter
 
 protected:
 	
-	UPROPERTY(EditDefaultsOnly, Category="PrimaryAttack")
-	TSubclassOf<ARogueProjectileMagic> ProjectileClass;
+	UPROPERTY(EditDefaultsOnly, Category="Abilities")
+	TObjectPtr<URogueAbilityDataAsset> PrimaryAbilityDataAsset;
 	
-	UPROPERTY(EditDefaultsOnly, Category="PrimaryAttack")
-	TObjectPtr<UNiagaraSystem> CastingEffect;
+	UPROPERTY(EditDefaultsOnly, Category="Abilities")
+	TObjectPtr<URogueAbilityDataAsset> SecondaryAbilityDataAsset;
 	
-	UPROPERTY(EditDefaultsOnly, Category="PrimaryAttack")
-	TObjectPtr<USoundBase> CastingSound;
+	UPROPERTY(EditDefaultsOnly, Category="Abilities")
+	TObjectPtr<URogueAbilityDataAsset> DashAbilityDataAsset;
 	
-	UPROPERTY(VisibleAnywhere, Category="PrimaryAttack")
-	FName MuzzleSocketName;
-	
-	UPROPERTY(EditDefaultsOnly, Category="PrimaryAttack")
-	TObjectPtr<UAnimMontage> AttackMontage;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_Move;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_Look;
 	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> Input_Jump;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_PrimaryAttack;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> Input_Jump;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> Input_SecondaryAttack;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> Input_Dash;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UCameraComponent> CameraComponent;
@@ -56,18 +58,20 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
 	
+	void CastAbility(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset);
+	void AbilityTimerElapsed(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset);
+	
 public:
 	ARoguePlayerCharacter();
 
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 	
-	virtual void Jump() override;
 	void Move(const FInputActionValue& InValue);
 	void Look(const FInputActionInstance& InValue);
 	
 	void PrimaryAttack();
-	void AttackTimerElapsed();
+	void SecondaryAttack();
+	void Dash();
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };
