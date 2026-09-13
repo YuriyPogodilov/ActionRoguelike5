@@ -22,7 +22,7 @@ struct FRogueAbilityData
 	TObjectPtr<USoundBase> CastingSound;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Animation")
-	FName MuzzleSocketName{ FName("Muzzle_O1") };
+	FName MuzzleSocketName{ FName("Muzzle_01") };
 	
 	UPROPERTY(EditDefaultsOnly, Category="Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
