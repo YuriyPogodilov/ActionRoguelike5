@@ -10,6 +10,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Projectiles/RogueProjectile.h"
 #include "Abilities/RogueAbilityDataAsset.h"
+#include "ActionSystem/RogueActionSystemComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 
 ARoguePlayerCharacter::ARoguePlayerCharacter()
 {
@@ -21,12 +23,37 @@ ARoguePlayerCharacter::ARoguePlayerCharacter()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
+	
+	ActionSystemComponent = CreateDefaultSubobject<URogueActionSystemComponent>(TEXT("ActionSystemComponent"));
 }
 
-void ARoguePlayerCharacter::BeginPlay()
+void ARoguePlayerCharacter::PostInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PostInitializeComponents();
 	
+	ActionSystemComponent->OnHealthChanged.AddDynamic(this, &ARoguePlayerCharacter::OnHealthChanged);
+}
+
+void ARoguePlayerCharacter::OnHealthChanged(float NewHealth, float OldHealth)
+{
+	if (FMath::IsNearlyZero(NewHealth))
+	{
+		DisableInput(nullptr);
+		
+		GetMovementComponent()->StopMovementImmediately();
+		
+		PlayAnimMontage(DeathMontage);
+	}
+}
+
+float ARoguePlayerCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	ActionSystemComponent->ApplyHealthChange(-DamageAmount);
+	
+	return ActualDamage;
 }
 
 void ARoguePlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

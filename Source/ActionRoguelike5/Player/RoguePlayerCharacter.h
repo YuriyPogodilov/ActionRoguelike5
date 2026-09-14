@@ -7,6 +7,7 @@
 
 #include "RoguePlayerCharacter.generated.h"
 
+class URogueActionSystemComponent;
 class URogueAbilityDataAsset;
 class UNiagaraSystem;
 class ARogueProjectile;
@@ -34,6 +35,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Abilities")
 	TObjectPtr<URogueAbilityDataAsset> DashAbilityDataAsset;
 	
+	UPROPERTY(EditDefaultsOnly, Category="Death")
+	TObjectPtr<UAnimMontage> DeathMontage;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_Move;
 	
@@ -58,13 +62,22 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<URogueActionSystemComponent> ActionSystemComponent;
+	
 	void CastAbility(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset);
 	void AbilityTimerElapsed(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset);
+	
+	UFUNCTION()
+	void OnHealthChanged(float NewHealth, float OldHealth);
 	
 public:
 	ARoguePlayerCharacter();
 
-	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
+	
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, 
+		class AController* EventInstigator, AActor* DamageCauser) override;
 	
 	void Move(const FInputActionValue& InValue);
 	void Look(const FInputActionInstance& InValue);
