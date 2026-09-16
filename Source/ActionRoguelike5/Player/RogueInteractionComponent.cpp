@@ -6,6 +6,10 @@
 #include "RogueGameTypes.h"
 #include "Core/RogueInteractionInterface.h"
 
+TAutoConsoleVariable<bool> CVarInteractionDebugDrawing(TEXT("game.interaction.DebugDraw"), false, 
+	TEXT("Enable interaction component debug rendering. (0 = off, 1 = enabled)"),
+	ECVF_Cheat);
+
 URogueInteractionComponent::URogueInteractionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -22,6 +26,8 @@ void URogueInteractionComponent::Interact() const
 void URogueInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	bool bEnableDebugDraw = CVarInteractionDebugDrawing.GetValueOnGameThread();
 
 	APlayerController* PC = CastChecked<APlayerController>(GetOwner());
 	FVector Center = PC->GetPawn()->GetActorLocation();
@@ -48,18 +54,27 @@ void URogueInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickT
 			HighestDot = DotResult;
 		}
 		
-		FString DebugDotValue = FString::Printf(TEXT("%0.3f"), DotResult);
-		DrawDebugBox(GetWorld(), OverlapLocation, FVector(40.f), FColor::Red);
-		DrawDebugString(GetWorld(), OverlapLocation, DebugDotValue, nullptr, FColor::White, 0, true);
+		if (bEnableDebugDraw)
+		{
+			FString DebugDotValue = FString::Printf(TEXT("%0.3f"), DotResult);
+			DrawDebugBox(GetWorld(), OverlapLocation, FVector(40.f), FColor::Red);
+			DrawDebugString(GetWorld(), OverlapLocation, DebugDotValue, nullptr, FColor::White, 0, true);
+		}
 	}
 	
 	if (BestActor)
 	{
 		SelectedActor = BestActor;
-		
-		DrawDebugBox(GetWorld(), BestActor->GetActorLocation(), FVector(50.f), FColor::Green);
 	}
 	
-	DrawDebugSphere(GetWorld(), Center, InteractionRadius, 32, FColor::White);
+	if (bEnableDebugDraw)
+	{
+		if (BestActor)
+		{
+			DrawDebugBox(GetWorld(), BestActor->GetActorLocation(), FVector(50.f), FColor::Green);
+		}
+		
+		DrawDebugSphere(GetWorld(), Center, InteractionRadius, 32, FColor::White);
+	}
 }
 
