@@ -40,5 +40,6 @@ public:
 
 	URogueActionSystemComponent();
 
+	UFUNCTION(BlueprintCallable)
 	void ApplyHealthChange(float InValueChange);
 };
