@@ -12,6 +12,7 @@ ARogueExplosive::ARogueExplosive()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
 	MeshComp->SetSimulatePhysics(true);
+	MeshComp->SetCanEverAffectNavigation(false);
 	MeshComp->SetCollisionProfileName("PhysicsActor");
 	
 	RadialForceComponent = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForceComponent"));
