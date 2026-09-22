@@ -26,4 +26,7 @@ protected:
 	float MaxAttackRange;
 	
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+	
+public:
+	URogueBTService_CheckRangeTo();
 };
