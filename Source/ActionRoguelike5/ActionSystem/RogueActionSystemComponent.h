@@ -42,4 +42,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ApplyHealthChange(float InValueChange);
+	
+	const FRogueAttributeSet& GetAttributes() const;
 };

@@ -22,3 +22,8 @@ void URogueActionSystemComponent::ApplyHealthChange(float InValueChange)
 	
 	UE_LOG(LogTemp, Log, TEXT("Health changed: %f"), Attributes.Health);
 }
+
+const FRogueAttributeSet& URogueActionSystemComponent::GetAttributes() const
+{
+	return Attributes;
+}
