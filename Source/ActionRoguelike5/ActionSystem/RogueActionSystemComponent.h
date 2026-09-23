@@ -58,5 +58,7 @@ public:
 	
 	void StartAction(FName InActionName);
 	
+	void StopAction(FName InActionName);
+	
 	const FRogueAttributeSet& GetAttributes() const;
 };

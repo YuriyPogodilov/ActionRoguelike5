@@ -18,11 +18,13 @@ TAutoConsoleVariable<float> CVarProjectileAdjustmentDebugDrawing(TEXT("game.proj
 URogueAction_ProjectileAttack::URogueAction_ProjectileAttack()
 {
 	MuzzleSocketName = "Muzzle_01";
+	
+	CooldownTime = 0.5f;
 }
 
-void URogueAction_ProjectileAttack::StartAction()
+void URogueAction_ProjectileAttack::StartAction_Implementation()
 {
-	Super::StartAction();
+	Super::StartAction_Implementation();
 	
 	URogueActionSystemComponent* ActionComp = GetOwningComponent();
 	ACharacter* Character = CastChecked<ACharacter>(ActionComp->GetOwner());
@@ -78,6 +80,10 @@ void URogueAction_ProjectileAttack::AttackTimerElapsed()
 	
 	AActor* NewProjectile = World->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
 	
+	Character->MoveIgnoreActorAdd(NewProjectile);
+	
+	StopAction_Implementation();
+	
 #if !UE_BUILD_SHIPPING
 	float DrawDebugDuration = CVarProjectileAdjustmentDebugDrawing.GetValueOnGameThread();
 	
@@ -96,6 +102,4 @@ void URogueAction_ProjectileAttack::AttackTimerElapsed()
 		DrawDebugLine(World, SpawnLocation, (SpawnLocation + EyeRotation.Vector() * 5000.f), FColor::Purple, false, DrawDebugDuration);
 	}
 #endif
-	
-	Character->MoveIgnoreActorAdd(NewProjectile);
 }
