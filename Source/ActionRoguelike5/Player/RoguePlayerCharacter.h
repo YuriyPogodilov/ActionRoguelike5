@@ -8,9 +8,6 @@
 #include "RoguePlayerCharacter.generated.h"
 
 class URogueActionSystemComponent;
-class URogueAbilityDataAsset;
-class UNiagaraSystem;
-class ARogueProjectile;
 struct FInputActionInstance;
 struct FInputActionValue;
 class UInputAction;
@@ -25,15 +22,6 @@ class ACTIONROGUELIKE5_API ARoguePlayerCharacter : public ACharacter
 	GENERATED_BODY()
 
 protected:
-	
-	UPROPERTY(EditDefaultsOnly, Category="Abilities")
-	TObjectPtr<URogueAbilityDataAsset> PrimaryAbilityDataAsset;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Abilities")
-	TObjectPtr<URogueAbilityDataAsset> SecondaryAbilityDataAsset;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Abilities")
-	TObjectPtr<URogueAbilityDataAsset> DashAbilityDataAsset;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Death")
 	TObjectPtr<UAnimMontage> DeathMontage;
@@ -54,7 +42,7 @@ protected:
 	TObjectPtr<UInputAction> Input_SecondaryAttack;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	TObjectPtr<UInputAction> Input_Dash;
+	TObjectPtr<UInputAction> Input_SpecialAttack;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UCameraComponent> CameraComponent;
@@ -64,9 +52,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<URogueActionSystemComponent> ActionSystemComponent;
-	
-	void CastAbility(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset);
-	void AbilityTimerElapsed(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset);
 	
 	UFUNCTION()
 	void OnHealthChanged(float NewHealth, float OldHealth);
@@ -82,9 +67,7 @@ public:
 	void Move(const FInputActionValue& InValue);
 	void Look(const FInputActionInstance& InValue);
 	
-	void PrimaryAttack();
-	void SecondaryAttack();
-	void Dash();
+	void StartAction(FName InActionName);
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

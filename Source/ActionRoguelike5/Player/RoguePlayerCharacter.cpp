@@ -4,19 +4,11 @@
 #include "RoguePlayerCharacter.h"
 
 #include "EnhancedInputComponent.h"
-#include "NiagaraFunctionLibrary.h"
-#include "RogueGameTypes.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "Projectiles/RogueProjectile.h"
-#include "Abilities/RogueAbilityDataAsset.h"
 #include "ActionSystem/RogueActionSystemComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 
-TAutoConsoleVariable<float> CVarProjectileAdjustmentDebugDrawing(TEXT("game.projectile.DebugDraw"), 0.f, 
-	TEXT("Enable projectile aim adjustment debug rendering. (0 = off, > 0 is duration)"),
-	ECVF_Cheat);
 
 ARoguePlayerCharacter::ARoguePlayerCharacter()
 {
@@ -71,9 +63,9 @@ void ARoguePlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	EnhancedInput->BindAction(Input_Look, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::Look);
 	EnhancedInput->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::Jump);
 	
-	EnhancedInput->BindAction(Input_PrimaryAttack, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::PrimaryAttack);
-	EnhancedInput->BindAction(Input_SecondaryAttack, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::SecondaryAttack);
-	EnhancedInput->BindAction(Input_Dash, ETriggerEvent::Triggered, this, &ARoguePlayerCharacter::Dash);
+	EnhancedInput->BindAction(Input_PrimaryAttack, ETriggerEvent::Triggered, this, &ThisClass::StartAction, FName("PrimaryAttack"));
+	EnhancedInput->BindAction(Input_SecondaryAttack, ETriggerEvent::Triggered, this, &ThisClass::StartAction, FName("SecondaryAttack"));
+	EnhancedInput->BindAction(Input_SpecialAttack, ETriggerEvent::Triggered, this, &ThisClass::StartAction, FName("SpecialAttack"));
 }
 
 void ARoguePlayerCharacter::Move(const FInputActionValue& InValue)
@@ -99,92 +91,7 @@ void ARoguePlayerCharacter::Look(const FInputActionInstance& InValue)
 	AddControllerYawInput(InputValue.X);
 }
 
-void ARoguePlayerCharacter::CastAbility(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset)
+void ARoguePlayerCharacter::StartAction(FName InActionName)
 {
-	const FRogueAbilityData AbilityData = AbilityDataAsset->AbilityData;
-	
-	PlayAnimMontage(AbilityData.AttackMontage);
-	
-	UNiagaraFunctionLibrary::SpawnSystemAttached(AbilityData.CastingEffect, GetMesh(), AbilityData.MuzzleSocketName, 
-		FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::Type::SnapToTarget, true);
-	
-	UGameplayStatics::PlaySound2D(this, AbilityData.CastingSound);
-	
-	FTimerHandle AbilityTimerHandle;
-	FTimerDelegate AbilityTimerDelegate;
-	AbilityTimerDelegate.BindUObject(this, &ARoguePlayerCharacter::AbilityTimerElapsed, AbilityDataAsset);
-	
-	GetWorldTimerManager().SetTimer(AbilityTimerHandle, AbilityTimerDelegate, AbilityData.AnimationDelay, false);
-}
-
-void ARoguePlayerCharacter::AbilityTimerElapsed(TObjectPtr<URogueAbilityDataAsset> AbilityDataAsset)
-{
-	const FRogueAbilityData AbilityData = AbilityDataAsset->AbilityData;
-	
-	FVector SpawnLocation = GetMesh()->GetSocketLocation(AbilityData.MuzzleSocketName);
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Instigator = this;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	
-	FVector EyeLocation = CameraComponent->GetComponentLocation();
-	FRotator EyeRotation = GetControlRotation();
-	
-	FVector TraceEnd = EyeLocation + (EyeRotation.Vector() * 5000.f);
-	
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
-	
-	UWorld* World = GetWorld();
-	
-	FVector AdjustedTargetLocation;
-	
-	FHitResult HitResult;
-	if (World->LineTraceSingleByChannel(HitResult, EyeLocation, TraceEnd, COLLISION_PROJECTILE, QueryParams))
-	{
-		AdjustedTargetLocation = HitResult.Location;
-	}
-	else
-	{
-		AdjustedTargetLocation = TraceEnd;
-	}
-	
-	FRotator SpawnRotation = (AdjustedTargetLocation - SpawnLocation).Rotation();
-	
-	AActor* NewProjectile = World->SpawnActor<AActor>(AbilityData.ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
-	
-#if !UE_BUILD_SHIPPING
-	float DrawDebugDuration = CVarProjectileAdjustmentDebugDrawing.GetValueOnGameThread();
-	
-	if (DrawDebugDuration > 0.f)
-	{
-		// the hit location or trace end
-		DrawDebugBox(World, AdjustedTargetLocation, FVector(20.f), FColor::Green, false, DrawDebugDuration);
-	
-		// adjustment line trace
-		DrawDebugLine(World, EyeLocation, AdjustedTargetLocation, FColor::Green, false, DrawDebugDuration);
-
-		// New projectile path
-		DrawDebugLine(World, SpawnLocation, AdjustedTargetLocation, FColor::Yellow, false, DrawDebugDuration);
-	
-		// the original path of the projectile
-		DrawDebugLine(World, SpawnLocation, (SpawnLocation + GetControlRotation().Vector() * 5000.f), FColor::Purple, false, DrawDebugDuration);
-	}
-#endif
-	
-	MoveIgnoreActorAdd(NewProjectile);
-}
-
-void ARoguePlayerCharacter::PrimaryAttack()
-{
-	CastAbility(PrimaryAbilityDataAsset);
-}
-
-void ARoguePlayerCharacter::SecondaryAttack()
-{
-	CastAbility(SecondaryAbilityDataAsset);
-}
-
-void ARoguePlayerCharacter::Dash()
-{
-	CastAbility(DashAbilityDataAsset);
+	ActionSystemComponent->StartAction(InActionName);
 }
