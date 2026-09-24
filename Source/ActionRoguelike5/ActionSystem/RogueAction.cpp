@@ -20,6 +20,11 @@ void URogueAction::StartAction_Implementation()
 
 void URogueAction::StopAction_Implementation()
 {
+	if (!IsRunning())
+	{
+		return;
+	}
+	
 	bIsRunning = false;
 	
 	float GameTime = GetWorld()->TimeSeconds;
@@ -35,11 +40,6 @@ void URogueAction::StopAction_Implementation()
 
 bool URogueAction::CanStart() const
 {
-	if (IsRunning())
-	{
-		return false;
-	}
-	
 	if (GetCooldownTimeRemaining() > 0.0f)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Cooldown remaining: %f"), GetCooldownTimeRemaining());
