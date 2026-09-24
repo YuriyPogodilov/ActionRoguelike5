@@ -3,6 +3,8 @@
 
 #include "RogueActionSystemComponent.h"
 
+#include "GameplayTagContainer.h"
+
 #include "RogueAction.h"
 
 
@@ -45,7 +47,7 @@ void URogueActionSystemComponent::ApplyHealthChange(float InValueChange)
 	UE_LOG(LogTemp, Log, TEXT("Health changed: %f"), Attributes.Health);
 }
 
-void URogueActionSystemComponent::StartAction(FName InActionName)
+void URogueActionSystemComponent::StartAction(FGameplayTag InActionName)
 {
 	for (URogueAction* Action : Actions)
 	{
@@ -60,10 +62,10 @@ void URogueActionSystemComponent::StartAction(FName InActionName)
 		}
 	}
 	
-	UE_LOGFMT(LogTemp, Warning, "No Action found with name {ActionName}", InActionName);
+	UE_LOGFMT(LogTemp, Warning, "No Action found with name {ActionName}", InActionName.ToString());
 }
 
-void URogueActionSystemComponent::StopAction(FName InActionName)
+void URogueActionSystemComponent::StopAction(FGameplayTag InActionName)
 {
 	for (URogueAction* Action : Actions)
 	{
@@ -74,7 +76,7 @@ void URogueActionSystemComponent::StopAction(FName InActionName)
 		}
 	}
 	
-	UE_LOGFMT(LogTemp, Warning, "No Action found with name {ActionName}", InActionName);
+	UE_LOGFMT(LogTemp, Warning, "No Action found with name {ActionName}", InActionName.ToString());
 }
 
 const FRogueAttributeSet& URogueActionSystemComponent::GetAttributes() const

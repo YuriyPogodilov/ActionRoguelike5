@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "RogueActionSystemComponent.generated.h"
 
 
+struct FGameplayTag;
 class URogueAction;
 
 USTRUCT(BlueprintType)
@@ -44,9 +46,12 @@ protected:
 	TArray<TSubclassOf<URogueAction>> DefaultActions;
 	
 public:
+	
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
 
+	FGameplayTagContainer ActiveGameplayTags;
+	
 	URogueActionSystemComponent();
 	
 	virtual void InitializeComponent() override;
@@ -56,9 +61,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyHealthChange(float InValueChange);
 	
-	void StartAction(FName InActionName);
+	void StartAction(FGameplayTag InActionName);
 	
-	void StopAction(FName InActionName);
+	void StopAction(FGameplayTag InActionName);
 	
 	const FRogueAttributeSet& GetAttributes() const;
 };
