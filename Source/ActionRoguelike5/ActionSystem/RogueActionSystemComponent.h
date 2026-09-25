@@ -13,7 +13,10 @@ struct FRogueAttribute;
 struct FGameplayTag;
 class URogueAction;
 
+// Native C++
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnAttributeChanged, FGameplayTag /*AttributeTag*/, float /*NewHealth*/, float /*OldHealth*/);
+// Blueprint delegate
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FOnAttributeChanged_Dynamic, FGameplayTag, AttributeTag, float, NewHealth, float, OldHealth);
 
 UENUM(BlueprintType)
 enum EAttributeModifyType
@@ -40,6 +43,8 @@ protected:
 	TMap<FGameplayTag, FRogueAttribute*> CachedAttributes;
 	
 	TMap<FGameplayTag, FOnAttributeChanged> AttributeListeners;
+	
+	TMap<FGameplayTag, TArray<FOnAttributeChanged_Dynamic>> AttributeDynamicListeners;
 	
 	UPROPERTY()	
 	TArray<TObjectPtr<URogueAction>> Actions;
@@ -68,7 +73,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyAttributeChange(FGameplayTag AttributeTag, float InValueChange, EAttributeModifyType ModifyType);
 	
-	FRogueAttribute* GetAttribute(FGameplayTag InAttributeTag) const;
+	FRogueAttribute* GetAttribute(FGameplayTag AttributeTag) const;
+	
+	UFUNCTION(BlueprintCallable)
+	float GetAttributeValue(FGameplayTag AttributerTag) const;
 	
 	FOnAttributeChanged& GetAttributeListener(FGameplayTag AttributeTag);
+	
+	UFUNCTION(BlueprintCallable, DisplayName="Add Attribute Listener", meta=(Keywords="delegate,event"))
+	void AddDynamicAttributeListener(FOnAttributeChanged_Dynamic Event, FGameplayTag AttributeTag);
+	
+	UFUNCTION(BlueprintCallable, DisplayName="Remove Attribute Listener", meta=(Keywords="delegate,event"))
+	void RemoveDynamicAttributeListener(FOnAttributeChanged_Dynamic Event);
 };

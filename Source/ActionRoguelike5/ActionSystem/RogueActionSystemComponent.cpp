@@ -113,9 +113,25 @@ void URogueActionSystemComponent::ApplyAttributeChange(FGameplayTag AttributeTag
 	
 	Attributes->PostAttributeChanged();
 	
+	// Native C++ listeners
 	if (FOnAttributeChanged* Event = AttributeListeners.Find(AttributeTag))
 	{
 		Event->Broadcast(AttributeTag, FoundAttribute->GetValue(), OldValue);
+	}
+	
+	// Blueprint listeners
+	if (TArray<FOnAttributeChanged_Dynamic>* Events = AttributeDynamicListeners.Find(AttributeTag))
+	{
+		for (int i = Events->Num() - 1; i >= 0; --i)
+		{
+			FOnAttributeChanged_Dynamic& Event = (*Events)[i];
+			bool bIsBound = Event.ExecuteIfBound(AttributeTag, FoundAttribute->GetValue(), OldValue);
+			if (!bIsBound)
+			{
+				Events->RemoveAt(i);
+				UE_LOG(LogTemp, Warning, TEXT("Cleaned up expired attribute delegate for %s"), *GetNameSafe(GetOwner()));
+			}
+		}
 	}
 	
 	UE_LOGFMT(LogTemp, Log, "Changed Attribute: {0}, New: {1}, Old: {2}",
@@ -125,14 +141,39 @@ void URogueActionSystemComponent::ApplyAttributeChange(FGameplayTag AttributeTag
 	);
 }
 
-FRogueAttribute* URogueActionSystemComponent::GetAttribute(FGameplayTag InAttributeTag) const
+FRogueAttribute* URogueActionSystemComponent::GetAttribute(FGameplayTag AttributeTag) const
 {
-	FRogueAttribute* FoundAttribute = *CachedAttributes.Find(InAttributeTag);
+	FRogueAttribute* const* FoundAttribute = CachedAttributes.Find(AttributeTag);
 	
-	return FoundAttribute;
+	return *FoundAttribute;
+}
+
+float URogueActionSystemComponent::GetAttributeValue(FGameplayTag AttributerTag) const
+{
+	FRogueAttribute* FoundAttribute = GetAttribute(AttributerTag);
+	
+	return FoundAttribute->GetValue();
 }
 
 FOnAttributeChanged& URogueActionSystemComponent::GetAttributeListener(FGameplayTag AttributeTag)
 {
 	return AttributeListeners.FindOrAdd(AttributeTag);
+}
+
+void URogueActionSystemComponent::AddDynamicAttributeListener(FOnAttributeChanged_Dynamic Event, FGameplayTag AttributeTag)
+{
+	TArray<FOnAttributeChanged_Dynamic>& Events = AttributeDynamicListeners.FindOrAdd(AttributeTag);
+	Events.Add(Event);
+}
+
+void URogueActionSystemComponent::RemoveDynamicAttributeListener(FOnAttributeChanged_Dynamic Event)
+{
+	for (TPair<FGameplayTag, TArray<FOnAttributeChanged_Dynamic>>& Listener : AttributeDynamicListeners)
+	{
+		if (Listener.Value.RemoveSingle(Event) > 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Successfully removed blueprint binding."));
+			break;
+		}
+	}
 }
