@@ -57,8 +57,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<URogueActionSystemComponent> ActionSystemComponent;
 	
-	UFUNCTION()
-	void OnHealthChanged(float NewHealth, float OldHealth);
+	void OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth);
 	
 public:
 	ARoguePlayerCharacter();

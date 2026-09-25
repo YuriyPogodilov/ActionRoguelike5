@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "RogueAICharacter.generated.h"
 
+struct FGameplayTag;
 class URogueActionSystemComponent;
 
 UCLASS()
@@ -21,8 +22,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Death")
 	TObjectPtr<UAnimMontage> DeathMontage;
 	
-	UFUNCTION()
-	void OnHealthChanged(float NewHealth, float OldHealth);
+	void OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth);
 	
 public:
 	ARogueAICharacter();

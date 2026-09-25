@@ -30,10 +30,10 @@ void ARoguePlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	
-	ActionSystemComponent->OnHealthChanged.AddDynamic(this, &ARoguePlayerCharacter::OnHealthChanged);
+	ActionSystemComponent->GetAttributeListener(SharedGameplayTags::Attribute_Health).AddUObject(this, &ThisClass::OnHealthChanged);
 }
 
-void ARoguePlayerCharacter::OnHealthChanged(float NewHealth, float OldHealth)
+void ARoguePlayerCharacter::OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth)
 {
 	if (FMath::IsNearlyZero(NewHealth))
 	{

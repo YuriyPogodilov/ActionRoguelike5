@@ -8,7 +8,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 
 
-void ARogueAICharacter::OnHealthChanged(float NewHealth, float OldHealth)
+void ARogueAICharacter::OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth)
 {
 	if (FMath::IsNearlyZero(NewHealth))
 	{
@@ -29,7 +29,7 @@ void ARogueAICharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	
-	ActionSystemComponent->OnHealthChanged.AddDynamic(this, &ARogueAICharacter::OnHealthChanged);
+	ActionSystemComponent->GetAttributeListener(SharedGameplayTags::Attribute_Health).AddUObject(this, &ThisClass::OnHealthChanged);
 }
 
 float ARogueAICharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
