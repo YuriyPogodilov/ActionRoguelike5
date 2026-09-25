@@ -16,7 +16,7 @@ bool URogueBTDecorator_LowHealth::CalculateRawConditionValue(UBehaviorTreeCompon
 	URogueActionSystemComponent* ActionComp = OwningPawn->GetComponentByClass<URogueActionSystemComponent>();
 	check(ActionComp);
 	
-	FRogueAttributeSet Attributes = ActionComp->GetAttributes();
-	
-	return (Attributes.Health / Attributes.MaxHealth < LowHealthThreshHold);
+	check(false);
+	// TODO: Fix after refactoring attributes
+	return false;
 }
