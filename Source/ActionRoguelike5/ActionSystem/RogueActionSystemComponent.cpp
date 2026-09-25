@@ -82,24 +82,35 @@ void URogueActionSystemComponent::StopAction(FGameplayTag InActionName)
 	UE_LOGFMT(LogTemp, Warning, "No Action found with name {ActionName}", InActionName.ToString());
 }
 
-void URogueActionSystemComponent::ApplyHealthChange(float InValueChange)
+void URogueActionSystemComponent::ApplyAttributeChange(FGameplayTag AttributeTag, float InValueChange, EAttributeModifyType ModifyType)
 {
-	// float OldHealth = Attributes.Health;
-	// Attributes.Health = FMath::Clamp(Attributes.Health + InValueChange, 0.f, Attributes.MaxHealth);
-	//
-	// if (FMath::IsNearlyEqual(OldHealth, Attributes.Health))
-	// {
-	// 	return;
-	// }
-	//
-	// OnHealthChanged.Broadcast(Attributes.Health, OldHealth);
-	//
-	// UE_LOG(LogTemp, Log, TEXT("Health changed: %f"), Attributes.Health);
-}
+	FRogueAttribute* FoundAttribute = GetAttribute(AttributeTag);
+	check(FoundAttribute);
+	
+	float OldValue = FoundAttribute->GetValue();
 
-bool URogueActionSystemComponent::IsFullHealth() const
-{
-	return true;
+	switch (ModifyType)
+	{
+	case Base:
+		FoundAttribute->Base += InValueChange;
+		break;
+	case Modifier:
+		FoundAttribute->Modifier += InValueChange;
+		break;
+	case OverrideBase:
+		FoundAttribute->Base = InValueChange;
+		break;
+	default:
+		check(false);
+	}
+	
+	Attributes->PostAttributeChanged();
+	
+	UE_LOGFMT(LogTemp, Log, "Changed Attribute: {0}, New: {1}, Old: {2}",
+		AttributeTag.ToString(),
+		FoundAttribute->GetValue(),
+		OldValue
+	);
 }
 
 FRogueAttribute* URogueActionSystemComponent::GetAttribute(FGameplayTag InAttributeTag) const
