@@ -5,8 +5,15 @@
 
 #include "SharedGameplayTags.h"
 #include "ActionSystem/RogueActionSystemComponent.h"
+#include "ActionSystem/RogueAttributeSet.h"
 #include "GameFramework/PawnMovementComponent.h"
 
+
+ARogueAICharacter::ARogueAICharacter()
+{
+	ActionSystemComponent = CreateDefaultSubobject<URogueActionSystemComponent>(TEXT("ActionSystemComp"));
+	ActionSystemComponent->SetDefaultAttributeSet(URogueMonsterAttributeSet::StaticClass());
+}
 
 void ARogueAICharacter::OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth)
 {
@@ -18,11 +25,6 @@ void ARogueAICharacter::OnHealthChanged(FGameplayTag AttributeTag, float NewHeal
 		
 		PlayAnimMontage(DeathMontage);
 	}
-}
-
-ARogueAICharacter::ARogueAICharacter()
-{
-	ActionSystemComponent = CreateDefaultSubobject<URogueActionSystemComponent>(TEXT("ActionSystemComp"));
 }
 
 void ARogueAICharacter::PostInitializeComponents()

@@ -27,18 +27,15 @@ enum EAttributeModifyType
 	Invalid
 };
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), HideCategories=(Navigation,Cooking,Tags))
 class ACTIONROGUELIKE5_API URogueActionSystemComponent : public UActorComponent
 {
 	GENERATED_BODY()
 	
 protected:
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Instanced, NoClear, Category="ActionSystem")
 	TObjectPtr<URogueAttributeSet> Attributes;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Attributes", NoClear)
-	TSubclassOf<URogueAttributeSet> AttributesSetClass;
 	
 	TMap<FGameplayTag, FRogueAttribute*> CachedAttributes;
 	
@@ -49,7 +46,7 @@ protected:
 	UPROPERTY()	
 	TArray<TObjectPtr<URogueAction>> Actions;
 	
-	UPROPERTY(EditAnywhere, Category="Actions")	
+	UPROPERTY(EditAnywhere, Category="ActionSystem")	
 	TArray<TSubclassOf<URogueAction>> DefaultActions;
 	
 public:
@@ -69,6 +66,8 @@ public:
 	
 	void StopAction(FGameplayTag InActionName);
 	
+	
+	void SetDefaultAttributeSet(TSubclassOf<URogueAttributeSet> AttributeClass);
 	
 	UFUNCTION(BlueprintCallable)
 	void ApplyAttributeChange(FGameplayTag AttributeTag, float InValueChange, EAttributeModifyType ModifyType);

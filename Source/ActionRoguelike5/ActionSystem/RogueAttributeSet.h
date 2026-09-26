@@ -30,7 +30,7 @@ struct FRogueAttribute
 	}
 };
 
-UCLASS()
+UCLASS(EditInlineNew)
 class ACTIONROGUELIKE5_API URogueAttributeSet : public UObject
 {
 	GENERATED_BODY()
@@ -51,10 +51,10 @@ class URogueHealthAttributeSet : public URogueAttributeSet
 
 public:
 	
-	UPROPERTY(EditAnywhere, Category="Attributes")
+	UPROPERTY(EditAnywhere, Category="Health")
 	FRogueAttribute Health;
 	
-	UPROPERTY(EditAnywhere, Category="Attributes")
+	UPROPERTY(EditAnywhere, Category="Health")
 	FRogueAttribute HealthMax;
 	
 	virtual void PostAttributeChanged() override;
@@ -69,10 +69,10 @@ class URoguePawnAttributeSet : public URogueHealthAttributeSet
 
 protected:
 	
-	UPROPERTY(EditAnywhere, Category="Attributes")
+	UPROPERTY(EditAnywhere, Category="MoveSpeed")
 	FRogueAttribute MoveSpeed;
 	
-	UPROPERTY(EditAnywhere, Category="Attributes")
+	UPROPERTY(EditAnywhere, Category="MoveSpeed")
 	FRogueAttribute MoveSpeedMultiplier;
 	
 	void ApplyMoveSpeed();
@@ -93,10 +93,10 @@ class URoguePlayerAttributeSet : public URoguePawnAttributeSet
 
 protected:
 	
-	UPROPERTY(EditAnywhere, Category="Attributes")
+	UPROPERTY(EditAnywhere, Category="Resources")
 	FRogueAttribute Rage;
 	
-	UPROPERTY(EditAnywhere, Category="Attributes")
+	UPROPERTY(EditAnywhere, Category="Resources")
 	FRogueAttribute RageMax;
 	
 public:
