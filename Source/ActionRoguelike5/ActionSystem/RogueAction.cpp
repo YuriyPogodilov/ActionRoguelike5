@@ -17,10 +17,10 @@ void URogueAction::StartAction_Implementation()
 		("WorldTime", GameTime));
 	
 	GetOwningComponent()->ActiveGameplayTags.AppendTags(GrantTags);
-	
-	if (!FMath::IsNearlyZero(RageCost))
+
+	for (const TPair<FGameplayTag, float>& Cost : ActivationCost)
 	{
-		GetOwningComponent()->ApplyAttributeChange(SharedGameplayTags::Attribute_Rage, -RageCost, Base);
+		GetOwningComponent()->ApplyAttributeChange(Cost.Key, -Cost.Value, Base);
 	}
 }
 
@@ -56,13 +56,19 @@ bool URogueAction::CanStart() const
 	{
 		return false;
 	}
-	
-	if (!FMath::IsNearlyZero(RageCost))
+
+	for (const TPair<FGameplayTag, float>& Cost : ActivationCost)
 	{
-		float RageAmount = GetOwningComponent()->GetAttributeValue(SharedGameplayTags::Attribute_Rage);
-		if (RageAmount < RageCost)
+		float AvailableAttributeAmount = GetOwningComponent()->GetAttributeValue(Cost.Key);
+		if (AvailableAttributeAmount < Cost.Value)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Not enough rage."));
+			UE_LOGFMT(LogTemp, Log, "Not enough {AttributeName} to activate {ActionName}. "
+				"Have {AvailableAttributeAmount} and need {RequiredAttributeAmount}",
+				("AttributeName", Cost.Key.ToString()),
+				("ActionName", ActionName.ToString()),
+				("AvailableAttributeAmount", AvailableAttributeAmount),
+				("RequiredAttributeAmount", Cost.Value));
+			
 			return false;
 		}
 	}

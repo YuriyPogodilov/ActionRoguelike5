@@ -25,13 +25,13 @@ protected:
 	float CooldownTime{ 0.5f };
 	
 	UPROPERTY(EditDefaultsOnly, Category="Actions")
-	float RageCost{ 0.0f };
-	
-	UPROPERTY(EditDefaultsOnly, Category="Actions")
 	FGameplayTagContainer GrantTags;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Actions")
 	FGameplayTagContainer BlockedTags;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Actions")
+	TMap<FGameplayTag, float> ActivationCost;
 	
 public:
 	
