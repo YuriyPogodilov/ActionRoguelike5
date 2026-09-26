@@ -88,8 +88,19 @@ class URoguePlayerAttributeSet : public URoguePawnAttributeSet
 {
 	GENERATED_BODY()
 
+protected:
+	
+	UPROPERTY(EditAnywhere, Category="Attributes")
+	FRogueAttribute Rage;
+	
+	UPROPERTY(EditAnywhere, Category="Attributes")
+	FRogueAttribute RageMax;
+	
 public:
 	
+	virtual void PostAttributeChanged() override;
+	
+	URoguePlayerAttributeSet();
 };
 
 UCLASS()

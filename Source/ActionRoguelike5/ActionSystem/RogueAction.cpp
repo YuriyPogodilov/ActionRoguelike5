@@ -4,6 +4,7 @@
 #include "RogueAction.h"
 
 #include "RogueActionSystemComponent.h"
+#include "SharedGameplayTags.h"
 
 void URogueAction::StartAction_Implementation()
 {
@@ -16,6 +17,11 @@ void URogueAction::StartAction_Implementation()
 		("WorldTime", GameTime));
 	
 	GetOwningComponent()->ActiveGameplayTags.AppendTags(GrantTags);
+	
+	if (!FMath::IsNearlyZero(RageCost))
+	{
+		GetOwningComponent()->ApplyAttributeChange(SharedGameplayTags::Attribute_Rage, -RageCost, Base);
+	}
 }
 
 void URogueAction::StopAction_Implementation()
@@ -49,6 +55,16 @@ bool URogueAction::CanStart() const
 	if (GetOwningComponent()->ActiveGameplayTags.HasAny(BlockedTags))
 	{
 		return false;
+	}
+	
+	if (!FMath::IsNearlyZero(RageCost))
+	{
+		float RageAmount = GetOwningComponent()->GetAttributeValue(SharedGameplayTags::Attribute_Rage);
+		if (RageAmount < RageCost)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Not enough rage."));
+			return false;
+		}
 	}
 	
 	return true;

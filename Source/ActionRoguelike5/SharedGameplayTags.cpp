@@ -4,6 +4,8 @@ namespace SharedGameplayTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Health, "Attribute.Health")
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_HealthMax, "Attribute.HealthMax")
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Rage, "Attribute.Rage")
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_RageMax, "Attribute.RageMax")
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_MoveSpeed, "Attribute.MoveSpeed")
 	
 	UE_DEFINE_GAMEPLAY_TAG(Action_PrimaryAttack, "Action.PrimaryAttack")

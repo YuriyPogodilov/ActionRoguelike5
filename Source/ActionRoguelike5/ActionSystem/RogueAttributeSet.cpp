@@ -7,11 +7,14 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+
+/// -------------------- RogueAttributeSet ---------------------- 
 URogueActionSystemComponent* URogueAttributeSet::GetOwningComponent() const
 {
 	return CastChecked<URogueActionSystemComponent>(GetOuter());
 }
 
+/// -------------------- RogueHealthAttributeSet ---------------------- 
 URogueHealthAttributeSet::URogueHealthAttributeSet()
 {
 	HealthMax = FRogueAttribute(100.0f);
@@ -25,6 +28,7 @@ void URogueHealthAttributeSet::PostAttributeChanged()
 	Health.Base = FMath::Clamp(Health.Base, 0.0f, HealthMax.GetValue());
 }
 
+/// -------------------- RoguePawnAttributeSet ---------------------- 
 URoguePawnAttributeSet::URoguePawnAttributeSet()
 {
 	MoveSpeed = FRogueAttribute(550.0f);
@@ -49,6 +53,21 @@ void URoguePawnAttributeSet::PostAttributeChanged() {
 	ApplyMoveSpeed();
 }
 
+/// -------------------- RoguePlayerAttributeSet ---------------------- 
+URoguePlayerAttributeSet::URoguePlayerAttributeSet()
+{
+	Rage = FRogueAttribute(0.0f);
+	RageMax = FRogueAttribute(100.0f);
+}
+
+void URoguePlayerAttributeSet::PostAttributeChanged()
+{
+	Super::PostAttributeChanged();
+	
+	Rage.Base = FMath::Clamp(Rage.GetValue(), 0.0f, RageMax.GetValue());
+}
+
+/// -------------------- RogueMonsterAttributeSet ---------------------- 
 URogueMonsterAttributeSet::URogueMonsterAttributeSet()
 {
 	MoveSpeed = FRogueAttribute(450.0f);
