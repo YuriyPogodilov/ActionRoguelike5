@@ -72,6 +72,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Attributes")
 	FRogueAttribute MoveSpeed;
 	
+	UPROPERTY(EditAnywhere, Category="Attributes")
+	FRogueAttribute MoveSpeedMultiplier;
+	
 	void ApplyMoveSpeed();
 	
 public:

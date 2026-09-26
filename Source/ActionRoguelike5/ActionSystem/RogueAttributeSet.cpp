@@ -32,12 +32,13 @@ void URogueHealthAttributeSet::PostAttributeChanged()
 URoguePawnAttributeSet::URoguePawnAttributeSet()
 {
 	MoveSpeed = FRogueAttribute(550.0f);
+	MoveSpeedMultiplier = FRogueAttribute(1.0f);
 }
 
 void URoguePawnAttributeSet::ApplyMoveSpeed()
 {
 	ACharacter* OwningCharacter = Cast<ACharacter>(GetOwningComponent()->GetOwner());
-	OwningCharacter->GetCharacterMovement()->MaxWalkSpeed = MoveSpeed.GetValue();
+	OwningCharacter->GetCharacterMovement()->MaxWalkSpeed = MoveSpeed.GetValue() * MoveSpeedMultiplier.GetValue();
 }
 
 void URoguePawnAttributeSet::InitializeAttribute()
