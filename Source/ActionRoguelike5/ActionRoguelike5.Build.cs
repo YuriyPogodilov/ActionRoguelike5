@@ -10,9 +10,23 @@ public class ActionRoguelike5 : ModuleRules
 		
 		PublicIncludePaths.Add("ActionRoguelike5");
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput", "Niagara", "AIModule", "GameplayTags", "NavigationSystem" });
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"EnhancedInput",
+			"Niagara",
+			"AIModule",
+			"GameplayTags",
+			"NavigationSystem",
+			"DeveloperSettings",
+		});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

@@ -6,6 +6,7 @@
 #include "ActionRoguelike5.h"
 #include "EngineUtils.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Core/RogueDeveloperSettings.h"
 #include "Player/RoguePlayerCharacter.h"
 
 
@@ -13,13 +14,17 @@ void URogueCoinPickupSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
 	
-	FSoftObjectPath MeshAssetPath(TEXT("/Game/ExampleContent/Meshes/SM_Pickup_Coin.SM_Pickup_Coin"));
-	UStaticMesh* LoadedMesh = Cast<UStaticMesh>(MeshAssetPath.TryLoad()); 
-	
 	MeshISM = Cast<UInstancedStaticMeshComponent>(NewObject<UInstancedStaticMeshComponent>(&InWorld, NAME_None, RF_Transient));
 	MeshISM->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MeshISM->SetStaticMesh(LoadedMesh);
 	MeshISM->RegisterComponentWithWorld(&InWorld);
+	
+	GetDefault<URogueDeveloperSettings>()->CoinPickupMesh.LoadAsync(
+		FLoadSoftObjectPathAsyncDelegate::CreateUObject(this, &ThisClass::OnPickupMeshLoadComplete));
+}
+
+void URogueCoinPickupSubsystem::OnPickupMeshLoadComplete(const FSoftObjectPath& SoftObjectPath, UObject* LoadedObject)
+{
+	MeshISM->SetStaticMesh(Cast<UStaticMesh>(LoadedObject));
 }
 
 void URogueCoinPickupSubsystem::AddCoinPickups(TArray<FVector> NewLocations, TArray<int32> NewAmounts)
