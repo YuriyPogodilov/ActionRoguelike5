@@ -25,6 +25,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Animation")
 	float AnimationTargetPitch{ 120.f };
 	
+	UPROPERTY(BlueprintReadOnly, Category="Chest")
+	bool bIsOpened{ false };
+	
 	float CurrentAnimation{ 0.f };
 	
 	UFUNCTION(BlueprintImplementableEvent)

@@ -1,6 +1,15 @@
 ﻿#include "RogueProjectileMagic.h"
 
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+
+
+ARogueProjectileMagic::ARogueProjectileMagic()
+{
+	ProjectileMovementComponent->InitialSpeed = 2000.0f;
+	
+	InitialLifeSpan = 8.0f;
+}
 
 void ARogueProjectileMagic::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -10,4 +19,3 @@ void ARogueProjectileMagic::OnActorHit(UPrimitiveComponent* HitComponent, AActor
 	
 	Super::OnActorHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
 }
-

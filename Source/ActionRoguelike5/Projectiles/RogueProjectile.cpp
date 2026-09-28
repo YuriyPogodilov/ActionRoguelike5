@@ -27,6 +27,8 @@ ARogueProjectile::ARogueProjectile()
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
 	ProjectileMovementComponent->InitialSpeed = 2000.0f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
+	
+	InitialLifeSpan = 30.0f;
 }
 
 void ARogueProjectile::PostInitializeComponents()

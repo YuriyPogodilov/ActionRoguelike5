@@ -73,10 +73,7 @@ void URogueInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		}
 	}
 	
-	if (BestActor)
-	{
-		SelectedActor = BestActor;
-	}
+	SelectedActor = BestActor;
 	
 	if (bEnableDebugDraw)
 	{

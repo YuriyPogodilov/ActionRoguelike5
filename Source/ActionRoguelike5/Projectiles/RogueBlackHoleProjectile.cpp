@@ -18,6 +18,8 @@ ARogueBlackHoleProjectile::ARogueBlackHoleProjectile()
 	RadialForceComponent->RemoveObjectTypeToAffect(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 	RadialForceComponent->ForceStrength = -2000000.f;
 	RadialForceComponent->Radius = 500.f;
+	
+	InitialLifeSpan = Duration;
 }
 
 void ARogueBlackHoleProjectile::BeginPlay()

@@ -20,6 +20,13 @@ ARogueItemChest::ARogueItemChest()
 
 void ARogueItemChest::Interact_Implementation()
 {
+	if (bIsOpened)
+	{
+		return;
+	}
+	
+	bIsOpened = true;
+	
 	SetActorTickEnabled(true);
 }
 
