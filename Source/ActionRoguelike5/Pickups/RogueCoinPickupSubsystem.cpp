@@ -5,18 +5,45 @@
 
 #include "ActionRoguelike5.h"
 #include "EngineUtils.h"
+#include "Components/InstancedStaticMeshComponent.h"
 #include "Player/RoguePlayerCharacter.h"
+
+
+void URogueCoinPickupSubsystem::OnWorldBeginPlay(UWorld& InWorld)
+{
+	Super::OnWorldBeginPlay(InWorld);
+	
+	FSoftObjectPath MeshAssetPath(TEXT("/Game/ExampleContent/Meshes/SM_Pickup_Coin.SM_Pickup_Coin"));
+	UStaticMesh* LoadedMesh = Cast<UStaticMesh>(MeshAssetPath.TryLoad()); 
+	
+	MeshISM = Cast<UInstancedStaticMeshComponent>(NewObject<UInstancedStaticMeshComponent>(&InWorld, NAME_None, RF_Transient));
+	MeshISM->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshISM->SetStaticMesh(LoadedMesh);
+	MeshISM->RegisterComponentWithWorld(&InWorld);
+}
 
 void URogueCoinPickupSubsystem::AddCoinPickups(TArray<FVector> NewLocations, TArray<int32> NewAmounts)
 {
 	CoinLocations.Append(NewLocations);
 	CoinAmounts.Append(NewAmounts);
+	
+	TArray<FTransform> MeshTransforms;
+	for (int i = 0; i < NewLocations.Num(); ++i)
+	{
+		MeshTransforms.Add(FTransform(NewLocations[i] + FVector(0.0f, 0.0f, 50.0f)));
+	}
+	
+	TArray<FPrimitiveInstanceId> NewMeshIds = MeshISM->AddInstancesById(MeshTransforms, true, false);
+	MeshIds.Append(NewMeshIds);
 }
 
 void URogueCoinPickupSubsystem::RemoveCoinPickup(int32 IndexToRemove)
 {
 	CoinLocations.RemoveAt(IndexToRemove);
 	CoinAmounts.RemoveAt(IndexToRemove);
+	
+	MeshISM->RemoveInstanceById(MeshIds[IndexToRemove]);
+	MeshIds.RemoveAt(IndexToRemove);
 }
 
 void URogueCoinPickupSubsystem::Tick(float DeltaTime)

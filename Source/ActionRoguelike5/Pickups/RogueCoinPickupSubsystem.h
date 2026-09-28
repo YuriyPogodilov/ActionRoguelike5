@@ -20,12 +20,18 @@ public:
 	
 	void RemoveCoinPickup(int32 IndexToRemove);
 	
+	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
+	
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(RogueCoinPickupSubsystem, STATGROUP_Tickables); }
 	
 protected:
 	
+	UPROPERTY()
+	TObjectPtr<UInstancedStaticMeshComponent> MeshISM;
+	
 	TArray<FVector> CoinLocations;
 	TArray<int32> CoinAmounts;
+	TArray<FPrimitiveInstanceId> MeshIds;
 };
