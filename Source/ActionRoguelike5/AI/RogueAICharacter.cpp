@@ -31,6 +31,8 @@ void ARogueAICharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	
+	GetMesh()->SetOverlayMaterialMaxDrawDistance(1.0f);
+	
 	ActionSystemComponent->GetAttributeListener(SharedGameplayTags::Attribute_Health).AddUObject(this, &ThisClass::OnHealthChanged);
 }
 
@@ -39,6 +41,16 @@ float ARogueAICharacter::TakeDamage(float DamageAmount, struct FDamageEvent cons
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
 	ActionSystemComponent->ApplyAttributeChange(SharedGameplayTags::Attribute_Health, -DamageAmount, EAttributeModifyType::Base);
+	
+	// HitFlash
+	GetMesh()->SetOverlayMaterialMaxDrawDistance(0.0f);
+	
+	GetMesh()->SetCustomPrimitiveDataFloat(0, GetWorld()->GetTimeSeconds());
+	
+	GetWorldTimerManager().SetTimer(OverlayTimerHandle, [this]()
+	{
+		GetMesh()->SetOverlayMaterialMaxDrawDistance(1.0f);
+	}, 1.0f, false);
 	
 	return ActualDamage;
 }

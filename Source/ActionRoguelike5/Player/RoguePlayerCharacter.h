@@ -75,4 +75,8 @@ public:
 	void StopAction(FGameplayTag InActionName);
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+protected:
+	
+	FTimerHandle OverlayTimerHandle;
 };
