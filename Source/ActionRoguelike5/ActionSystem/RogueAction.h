@@ -52,6 +52,8 @@ public:
 	
 	FGameplayTag GetActionName() const { return ActionName; }
 	
+	virtual bool ImplementsGetWorld() const override { return true; }
+	
 protected:
 	
 	UPROPERTY(Transient)
