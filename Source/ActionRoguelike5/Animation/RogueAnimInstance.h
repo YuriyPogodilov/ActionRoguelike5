@@ -6,6 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "RogueAnimInstance.generated.h"
 
+struct FGameplayTag;
 class URogueActionSystemComponent;
 /**
  * 
@@ -30,6 +31,10 @@ public:
 	
 	virtual void NativeInitializeAnimation() override;
 	
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	virtual void NativeBeginPlay() override;
 	
+protected:
+	
+	UFUNCTION()
+	void OnTagUpdated(FGameplayTag UpdatedTag, int32 NewCount);
 };

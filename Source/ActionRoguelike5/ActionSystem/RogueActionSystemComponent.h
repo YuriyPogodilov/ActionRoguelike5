@@ -18,6 +18,8 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnAttributeChanged, FGameplayTag /*Attri
 // Blueprint delegate
 DECLARE_DYNAMIC_DELEGATE_ThreeParams(FOnAttributeChanged_Dynamic, FGameplayTag, AttributeTag, float, NewHealth, float, OldHealth);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameplayTagsCountUpdate, FGameplayTag, UpdatedTag, int32, NewCount);
+
 UENUM(BlueprintType)
 enum EAttributeModifyType
 {
@@ -49,9 +51,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category="ActionSystem")	
 	TArray<TSubclassOf<URogueAction>> DefaultActions;
 	
-public:
-	
 	FGameplayTagContainer ActiveGameplayTags;
+	
+	void CheckAgainstBlockedTags(const FGameplayTagContainer& NewTags);
+	
+public:
 	
 	URogueActionSystemComponent();
 	
@@ -68,6 +72,14 @@ public:
 	void StartAction(FGameplayTag InActionName);
 	
 	void StopAction(FGameplayTag InActionName);
+	
+	void AppendActiveTags(const FGameplayTagContainer& NewTags);
+	
+	void RemoveActiveTags(const FGameplayTagContainer& TagsToRemove);
+	
+	const FGameplayTagContainer& GetActiveTags() const { return ActiveGameplayTags; }
+	
+	FOnGameplayTagsCountUpdate OnGameplayTagsCountUpdate;
 	
 	
 	void SetDefaultAttributeSet(TSubclassOf<URogueAttributeSet> AttributeClass);

@@ -107,6 +107,48 @@ void URogueActionSystemComponent::StopAction(FGameplayTag InActionName)
 	UE_LOGFMT(LogGame, Warning, "No Action found with name {ActionName}", InActionName.ToString());
 }
 
+void URogueActionSystemComponent::AppendActiveTags(const FGameplayTagContainer& NewTags)
+{
+	ActiveGameplayTags.AppendTags(NewTags);
+	
+	CheckAgainstBlockedTags(NewTags);
+
+	for (const FGameplayTag& Tag : NewTags)
+	{
+		OnGameplayTagsCountUpdate.Broadcast(Tag, 1);
+	}
+}
+
+void URogueActionSystemComponent::RemoveActiveTags(const FGameplayTagContainer& TagsToRemove)
+{
+	int32 PrevCount = ActiveGameplayTags.Num();
+	
+	ActiveGameplayTags.RemoveTags(TagsToRemove);
+		
+	ensure(PrevCount - ActiveGameplayTags.Num() == TagsToRemove.Num());
+
+	for (const FGameplayTag& Tag : TagsToRemove)
+	{
+		OnGameplayTagsCountUpdate.Broadcast(Tag, 0);
+	}
+}
+
+void URogueActionSystemComponent::CheckAgainstBlockedTags(const FGameplayTagContainer& NewTags)
+{
+	for (URogueAction* Action : Actions)
+	{
+		if (Action->IsRunning() && NewTags.HasAny(NewTags))
+		{
+			Action->StopAction();
+		}
+		
+		UE_LOGFMT(LogGame, Log, "Stopped {ActionName} due to any matching blocked tag {BlockedTags} for {Owner}",
+			("ActionName", Action->GetActionName().ToString()),
+			("BlockedTags", NewTags.ToString()),
+			("Owner", GetNameSafe(GetOwner())));
+	}
+}
+
 void URogueActionSystemComponent::SetDefaultAttributeSet(TSubclassOf<URogueAttributeSet> AttributeSetClass)
 {
 	check(!HasBeenInitialized());
