@@ -16,7 +16,7 @@ class ACTIONROGUELIKE5_API URogueCoinPickupSubsystem : public UTickableWorldSubs
 	
 public:
 	
-	void AddCoinPickups(TArray<FVector> NewLocations, TArray<int32> NewAmounts);
+	void AddCoinPickups(const TArray<FVector>& NewLocations, const TArray<int32>& NewAmounts);
 	
 	void RemoveCoinPickup(int32 IndexToRemove);
 	

@@ -9,7 +9,9 @@
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Core/RogueDeveloperSettings.h"
 #include "Player/RoguePlayerCharacter.h"
+#include "ProfilingDebugging/CountersTrace.h"
 
+TRACE_DECLARE_INT_COUNTER(CoinInstanceCount, TEXT("Coins in world"));
 
 void URogueCoinPickupSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
@@ -17,6 +19,7 @@ void URogueCoinPickupSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 	
 	MeshISM = Cast<UInstancedStaticMeshComponent>(NewObject<UInstancedStaticMeshComponent>(&InWorld, NAME_None, RF_Transient));
 	MeshISM->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshISM->SetAffectDistanceFieldLighting(false);
 	MeshISM->RegisterComponentWithWorld(&InWorld);
 	
 	const URogueDeveloperSettings* DevSettings = GetDefault<URogueDeveloperSettings>();
@@ -27,10 +30,13 @@ void URogueCoinPickupSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 	
 	WorldAudioComp = Cast<UAudioComponent>(NewObject<UAudioComponent>(&InWorld, NAME_None, RF_Transient));
 	WorldAudioComp->SetAutoActivate(false);
+	WorldAudioComp->bAllowSpatialization = false;
 	WorldAudioComp->RegisterComponentWithWorld(&InWorld);
 	
 	DevSettings->CoinPickupSound.LoadAsync(
 		FLoadSoftObjectPathAsyncDelegate::CreateUObject(this, &ThisClass::OnPickupSoundLoadComplete));
+	
+	TRACE_COUNTER_SET(CoinInstanceCount, 0);
 }
 
 void URogueCoinPickupSubsystem::OnPickupMeshLoadComplete(const FSoftObjectPath& SoftObjectPath, UObject* LoadedObject)
@@ -53,8 +59,10 @@ void URogueCoinPickupSubsystem::PlayPickupSound()
 	WorldAudioComp->SetTriggerParameter(CoinPickupTriggerParamName);
 }
 
-void URogueCoinPickupSubsystem::AddCoinPickups(TArray<FVector> NewLocations, TArray<int32> NewAmounts)
+void URogueCoinPickupSubsystem::AddCoinPickups(const TArray<FVector>& NewLocations, const TArray<int32>& NewAmounts)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(CoinPickupSubsystem::AddCoinPickups)
+	
 	CoinLocations.Append(NewLocations);
 	CoinAmounts.Append(NewAmounts);
 	
@@ -66,20 +74,28 @@ void URogueCoinPickupSubsystem::AddCoinPickups(TArray<FVector> NewLocations, TAr
 	
 	TArray<FPrimitiveInstanceId> NewMeshIds = MeshISM->AddInstancesById(MeshTransforms, true, false);
 	MeshIds.Append(NewMeshIds);
+	
+	TRACE_COUNTER_SET(CoinInstanceCount, CoinLocations.Num());
 }
 
 void URogueCoinPickupSubsystem::RemoveCoinPickup(int32 IndexToRemove)
 {
-	CoinLocations.RemoveAt(IndexToRemove);
-	CoinAmounts.RemoveAt(IndexToRemove);
+	TRACE_CPUPROFILER_EVENT_SCOPE(CoinPickupSubsystem::RemoveCoinPickup)
+	
+	CoinLocations.RemoveAtSwap(IndexToRemove, EAllowShrinking::No);
+	CoinAmounts.RemoveAtSwap(IndexToRemove, EAllowShrinking::No);
 	
 	MeshISM->RemoveInstanceById(MeshIds[IndexToRemove]);
-	MeshIds.RemoveAt(IndexToRemove);
+	MeshIds.RemoveAtSwap(IndexToRemove, EAllowShrinking::No);
+	
+	TRACE_COUNTER_SET(CoinInstanceCount, CoinLocations.Num());
 }
 
 void URogueCoinPickupSubsystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	TRACE_CPUPROFILER_EVENT_SCOPE(CoinPickupSubsystem::Tick)
 	
 	UWorld* World = GetWorld();
 	
@@ -93,24 +109,32 @@ void URogueCoinPickupSubsystem::Tick(float DeltaTime)
 	
 	const float PickupRadius = 200.f;
 	
-	for (int i = 0; i < CoinLocations.Num(); ++i)
 	{
-		float Distance = FVector::Dist(PlayerLocation, CoinLocations[i]);
-		if (Distance < PickupRadius)
+		TRACE_CPUPROFILER_EVENT_SCOPE(CoinPickupSubsystem::Tick::DistanceCheck)
+		
+		for (int i = 0; i < CoinLocations.Num(); ++i)
 		{
-			ProcessList.Add(i);
+			float Distance = FVector::Dist(PlayerLocation, CoinLocations[i]);
+			if (Distance < PickupRadius)
+			{
+				ProcessList.Add(i);
+			}
 		}
 	}
 
 	int32 TotalCoinsToGrant = 0;
 	
-	for (int i = ProcessList.Num() - 1; i >= 0; --i)
 	{
-		int32 CoinIndex = ProcessList[i];
+		TRACE_CPUPROFILER_EVENT_SCOPE(CoinPickupSubsystem::Tick::PickupHandle)
 		
-		TotalCoinsToGrant += CoinAmounts[CoinIndex];
+		for (int i = ProcessList.Num() - 1; i >= 0; --i)
+		{
+			int32 CoinIndex = ProcessList[i];
 		
-		RemoveCoinPickup(CoinIndex);
+			TotalCoinsToGrant += CoinAmounts[CoinIndex];
+		
+			RemoveCoinPickup(CoinIndex);
+		}
 	}
 	
 	if (TotalCoinsToGrant > 0)
@@ -118,6 +142,7 @@ void URogueCoinPickupSubsystem::Tick(float DeltaTime)
 		PlayPickupSound();
 	}
 	
+#if 0
 	// @todo: grant coins to player
 	UE_CLOG(TotalCoinsToGrant > 0, LogGame, Log, TEXT("Picked up Coins amount = %d"), TotalCoinsToGrant);
 
@@ -125,4 +150,5 @@ void URogueCoinPickupSubsystem::Tick(float DeltaTime)
 	{
 		DrawDebugPoint(World, CoinLocations[i], 8.0f, FColor::White);
 	}
+#endif
 }
