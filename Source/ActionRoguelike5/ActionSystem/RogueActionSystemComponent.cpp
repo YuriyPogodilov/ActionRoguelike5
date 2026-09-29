@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 
 #include "RogueAction.h"
+#include "RogueActionEffect.h"
 #include "RogueAttributeSet.h"
 
 
@@ -56,6 +57,19 @@ void URogueActionSystemComponent::GrantAction(TSubclassOf<URogueAction> NewActio
 {
 	URogueAction* NewAction = NewObject<URogueAction>(this, NewActionClass);
 	Actions.Add(NewAction);
+	
+	if (NewAction->IsA(URogueActionEffect::StaticClass()))
+	{
+		ensureMsgf(NewAction->CanStart(), TEXT("Effect can not start. CanStart returns FALSE. Case not handled."));
+		
+		NewAction->StartAction();
+	}
+}
+
+void URogueActionSystemComponent::RemoveAction(URogueAction* ActionToRemove)
+{
+	int RemoveCount = Actions.RemoveSingle(ActionToRemove);
+	ensure(RemoveCount == 1);
 }
 
 void URogueActionSystemComponent::StartAction(FGameplayTag InActionName)

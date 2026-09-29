@@ -60,7 +60,10 @@ public:
 	virtual void BeginPlay() override;
 	
 	
+	UFUNCTION(BlueprintCallable)
 	void GrantAction(TSubclassOf<URogueAction> NewActionClass);
+	
+	void RemoveAction(URogueAction* ActionToRemove);
 
 	void StartAction(FGameplayTag InActionName);
 	
