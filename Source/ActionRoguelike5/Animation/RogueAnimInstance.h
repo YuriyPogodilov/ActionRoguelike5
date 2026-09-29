@@ -20,6 +20,9 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category="StatusEffect")
 	bool bIsSprinting{ false };
 	
+	UPROPERTY(Transient, BlueprintReadOnly, Category="StatusEffect")
+	bool bIsStunned{ false };
+	
 	UPROPERTY(Transient, BlueprintReadOnly)
 	TObjectPtr<URogueActionSystemComponent> ActionComp;
 
