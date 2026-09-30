@@ -79,6 +79,7 @@ public:
 	
 	const FGameplayTagContainer& GetActiveTags() const { return ActiveGameplayTags; }
 	
+	UPROPERTY(BlueprintAssignable)
 	FOnGameplayTagsCountUpdate OnGameplayTagsCountUpdate;
 	
 	
