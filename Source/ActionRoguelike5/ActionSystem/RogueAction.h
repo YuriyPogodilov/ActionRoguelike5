@@ -54,6 +54,8 @@ public:
 	
 	virtual bool ImplementsGetWorld() const override { return true; }
 	
+	const FGameplayTagContainer& GetBlockedTags() const { return BlockedTags; }
+	
 protected:
 	
 	UPROPERTY(Transient)

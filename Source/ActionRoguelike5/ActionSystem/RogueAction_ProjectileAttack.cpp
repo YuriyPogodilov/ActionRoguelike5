@@ -55,7 +55,7 @@ void URogueAction_ProjectileAttack::AttackTimerElapsed()
 	
 	FVector EyeLocation;
 	FRotator EyeRotation;
-	Character->GetController()->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+	Character->GetController()->GetPlayerViewPoint(EyeLocation, EyeRotation);
 	
 	FVector TraceEnd = EyeLocation + (EyeRotation.Vector() * 5000.f);
 	

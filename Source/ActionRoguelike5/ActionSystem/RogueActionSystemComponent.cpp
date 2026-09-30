@@ -109,43 +109,57 @@ void URogueActionSystemComponent::StopAction(FGameplayTag InActionName)
 
 void URogueActionSystemComponent::AppendActiveTags(const FGameplayTagContainer& NewTags)
 {
-	ActiveGameplayTags.AppendTags(NewTags);
-	
 	CheckAgainstBlockedTags(NewTags);
 
 	for (const FGameplayTag& Tag : NewTags)
 	{
-		OnGameplayTagsCountUpdate.Broadcast(Tag, 1);
+		int32& TagCount = ActiveGameplayTags.FindOrAdd(Tag);
+		++TagCount;
+		
+		OnGameplayTagsCountUpdate.Broadcast(Tag, TagCount);
 	}
 }
 
 void URogueActionSystemComponent::RemoveActiveTags(const FGameplayTagContainer& TagsToRemove)
 {
-	int32 PrevCount = ActiveGameplayTags.Num();
-	
-	ActiveGameplayTags.RemoveTags(TagsToRemove);
-		
-	ensure(PrevCount - ActiveGameplayTags.Num() == TagsToRemove.Num());
-
 	for (const FGameplayTag& Tag : TagsToRemove)
 	{
-		OnGameplayTagsCountUpdate.Broadcast(Tag, 0);
+		int32* Count = ActiveGameplayTags.Find(Tag);
+		
+		check(Count);
+		
+		--(*Count);
+		
+		OnGameplayTagsCountUpdate.Broadcast(Tag, *Count);
+		
+		if (*Count == 0)
+		{
+			ActiveGameplayTags.Remove(Tag);
+		}
 	}
+}
+
+FGameplayTagContainer URogueActionSystemComponent::GetActiveTags() const
+{
+	TArray<FGameplayTag> Tags;
+	ActiveGameplayTags.GetKeys(Tags);
+	
+	return FGameplayTagContainer::CreateFromArray(Tags);
 }
 
 void URogueActionSystemComponent::CheckAgainstBlockedTags(const FGameplayTagContainer& NewTags)
 {
 	for (URogueAction* Action : Actions)
 	{
-		if (Action->IsRunning() && NewTags.HasAny(NewTags))
+		if (Action->IsRunning() && NewTags.HasAny(Action->GetBlockedTags()))
 		{
 			Action->StopAction();
-		}
 		
-		UE_LOGFMT(LogGame, Log, "Stopped {ActionName} due to any matching blocked tag {BlockedTags} for {Owner}",
-			("ActionName", Action->GetActionName().ToString()),
-			("BlockedTags", NewTags.ToString()),
-			("Owner", GetNameSafe(GetOwner())));
+			UE_LOGFMT(LogGame, Log, "Stopped {ActionName} due to any matching blocked tag {BlockedTags} for {Owner}",
+				("ActionName", Action->GetActionName().ToString()),
+				("BlockedTags", NewTags.ToString()),
+				("Owner", GetNameSafe(GetOwner())));
+		}
 	}
 }
 

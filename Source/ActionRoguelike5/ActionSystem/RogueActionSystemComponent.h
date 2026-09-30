@@ -51,7 +51,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="ActionSystem")	
 	TArray<TSubclassOf<URogueAction>> DefaultActions;
 	
-	FGameplayTagContainer ActiveGameplayTags;
+	TMap<FGameplayTag, int32> ActiveGameplayTags;
 	
 	void CheckAgainstBlockedTags(const FGameplayTagContainer& NewTags);
 	
@@ -77,7 +77,7 @@ public:
 	
 	void RemoveActiveTags(const FGameplayTagContainer& TagsToRemove);
 	
-	const FGameplayTagContainer& GetActiveTags() const { return ActiveGameplayTags; }
+	FGameplayTagContainer GetActiveTags() const; 
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnGameplayTagsCountUpdate OnGameplayTagsCountUpdate;
