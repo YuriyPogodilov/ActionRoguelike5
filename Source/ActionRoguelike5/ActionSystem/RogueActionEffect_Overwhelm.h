@@ -30,6 +30,8 @@ public:
 	URogueActionEffect_Overwhelm();
 	
 	virtual void StartAction_Implementation() override;
+
+	virtual void StopAction_Implementation() override;
 	
 protected:
 	

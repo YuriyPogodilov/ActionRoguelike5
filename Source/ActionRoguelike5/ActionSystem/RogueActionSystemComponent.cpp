@@ -55,10 +55,26 @@ void URogueActionSystemComponent::BeginPlay()
 
 void URogueActionSystemComponent::GrantAction(TSubclassOf<URogueAction> NewActionClass)
 {
+	bool bIsEffectClass = NewActionClass->IsChildOf(URogueActionEffect::StaticClass());
+	if (bIsEffectClass)
+	{
+		for (URogueAction* Action : Actions)
+		{
+			if (URogueActionEffect* Effect = Cast<URogueActionEffect>(Action))
+			{
+				if (Effect->GetClass() == NewActionClass)
+				{
+					Effect->IncrementStackSize();
+					return;
+				}
+			}
+		}
+	}
+	
 	URogueAction* NewAction = NewObject<URogueAction>(this, NewActionClass);
 	Actions.Add(NewAction);
 	
-	if (NewAction->IsA(URogueActionEffect::StaticClass()))
+	if (bIsEffectClass)
 	{
 		ensureMsgf(NewAction->CanStart(), TEXT("Effect can not start. CanStart returns FALSE. Case not handled."));
 		
@@ -70,6 +86,8 @@ void URogueActionSystemComponent::RemoveAction(URogueAction* ActionToRemove)
 {
 	int RemoveCount = Actions.RemoveSingle(ActionToRemove);
 	ensure(RemoveCount == 1);
+	
+	ActionToRemove->MarkAsGarbage();
 }
 
 void URogueActionSystemComponent::StartAction(FGameplayTag InActionName)

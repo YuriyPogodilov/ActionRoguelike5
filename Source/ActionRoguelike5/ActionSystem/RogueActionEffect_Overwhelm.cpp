@@ -21,8 +21,15 @@ void URogueActionEffect_Overwhelm::StartAction_Implementation()
 	GetOwningComponent()->GetOwner()->OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnOwnerTakeDamage);
 }
 
+void URogueActionEffect_Overwhelm::StopAction_Implementation()
+{
+	Super::StopAction_Implementation();
+	
+	GetOwningComponent()->GetOwner()->OnTakeAnyDamage.RemoveAll(this);
+}
+
 void URogueActionEffect_Overwhelm::OnOwnerTakeDamage(AActor* DamagedActor, float Damage,
-                                                     const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+	const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	float CurrentTime = GetWorld()->GetTimeSeconds();
 	
@@ -30,8 +37,6 @@ void URogueActionEffect_Overwhelm::OnOwnerTakeDamage(AActor* DamagedActor, float
 	{
 		AccumulatedDamage = 0;
 		MostRecentDamageTime = CurrentTime;
-		
-		UE_LOG(LogGame, Warning, TEXT("Minion already stunned. Reset Accumulated dmg"));
 		
 		return;
 	}
@@ -47,8 +52,6 @@ void URogueActionEffect_Overwhelm::OnOwnerTakeDamage(AActor* DamagedActor, float
 	
 	MostRecentDamageTime = CurrentTime;
 	
-	UE_LOG(LogGame, Warning, TEXT("Received dmg: %.2f. Accumulated dmg: %.2f"), Damage, AccumulatedDamage);
-	
 	if (AccumulatedDamage > OverwhelmEffectDmgThreshold)
 	{
 		AccumulatedDamage = 0;
@@ -57,6 +60,6 @@ void URogueActionEffect_Overwhelm::OnOwnerTakeDamage(AActor* DamagedActor, float
 		
 		GetOwningComponent()->GrantAction(StunEffect);
 		
-		UE_LOG(LogGame, Warning, TEXT("Minion got stunned"));
+		UE_LOG(LogGame, Log, TEXT("Stun applied to %s"), *GetNameSafe(GetOwningComponent()->GetOwner()));
 	}
 }
