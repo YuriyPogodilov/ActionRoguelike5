@@ -16,4 +16,5 @@ namespace SharedGameplayTags
 	
 	UE_DEFINE_GAMEPLAY_TAG(Status_Sprinting, "Status.Sprinting")
 	UE_DEFINE_GAMEPLAY_TAG(StatusEffect_Stunned, "Status.Effect.Stunned")
+	UE_DEFINE_GAMEPLAY_TAG(StatusEffect_Overwhelm, "Status.Effect.Overwhelm")
 }

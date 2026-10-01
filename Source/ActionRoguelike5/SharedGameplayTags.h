@@ -18,4 +18,5 @@ namespace SharedGameplayTags
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Sprinting)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StatusEffect_Stunned)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StatusEffect_Overwhelm)
 }

@@ -22,8 +22,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Death")
 	TObjectPtr<UAnimMontage> DeathMontage;
 	
-	void OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth);
-	
 public:
 	ARogueAICharacter();
 	
@@ -32,6 +30,11 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
 protected:
+	
+	void OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth);
+	
+	UFUNCTION()
+	void OnGameplayTagsCountUpdate(FGameplayTag UpdatedTag, int32 NewCount);
 	
 	FTimerHandle OverlayTimerHandle;
 };

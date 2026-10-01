@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ACTIONROGUELIKE5_API URogueActionEffect : public URogueAction
 {
 	GENERATED_BODY()
