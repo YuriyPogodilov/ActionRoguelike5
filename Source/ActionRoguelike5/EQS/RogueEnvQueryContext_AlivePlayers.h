@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "EnvironmentQuery/EnvQueryContext.h"
-#include "RogueEnvQueryContext_TargetActor.generated.h"
+#include "RogueEnvQueryContext_AlivePlayers.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ACTIONROGUELIKE5_API URogueEnvQueryContext_TargetActor : public UEnvQueryContext
+class ACTIONROGUELIKE5_API URogueEnvQueryContext_AlivePlayers : public UEnvQueryContext
 {
 	GENERATED_BODY()
 	
