@@ -7,6 +7,7 @@
 #define COLLISION_INTERACTION ECC_GameTraceChannel1
 #define COLLISION_PROJECTILE ECC_GameTraceChannel2
 
+class URogueMonsterData;
 class UEnvQuery;
 class ARogueAICharacter;
 
@@ -16,10 +17,13 @@ struct FMonsterSpawnData : public FTableRowBase
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftClassPtr<ARogueAICharacter> MonsterClass;
+	TSoftObjectPtr<URogueMonsterData> MonsterData;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ClampMin=0.0f))
 	float SpawnCost{ 0.0f };
+	
+	UPROPERTY(EditAnywhere, meta=(ClampMin=0.0f))
+	float SpawnWeight{ 1.0f };
 };
 
 USTRUCT()
@@ -42,7 +46,15 @@ struct FRogueDirectorData
 	UPROPERTY(EditDefaultsOnly, Category="Spawn system")
 	float TimeBetweenWaves{ 0.0f };
 	
+	UPROPERTY(EditDefaultsOnly, Category="Spawn system")
+	FString DebugDisplayName{ TEXT("DirectorName") };
+	
+	UPROPERTY(EditDefaultsOnly, Category="Spawn system")
+	FColor DebugColor{ FColor::White };
+	
 	float CurrentCredits{ 0.0f };
 	
 	float NextTickTime{ 0.0f };
+	
+	FRandomStream RandomStream_MonsterSelection;
 };

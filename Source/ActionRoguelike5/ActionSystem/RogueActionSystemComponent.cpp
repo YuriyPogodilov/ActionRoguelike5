@@ -36,6 +36,13 @@ void URogueActionSystemComponent::InitializeComponent()
 		
 		CachedAttributes.Add(AttributeTag, FoundAttribute);
 	}
+}
+
+void URogueActionSystemComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	Attributes->InitializeAttribute();
 
 	for (TSubclassOf<URogueAction> ActionClass : DefaultActions)
 	{
@@ -44,13 +51,6 @@ void URogueActionSystemComponent::InitializeComponent()
 			GrantAction(ActionClass);
 		}
 	}
-}
-
-void URogueActionSystemComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	Attributes->InitializeAttribute();
 }
 
 void URogueActionSystemComponent::GrantAction(TSubclassOf<URogueAction> NewActionClass)

@@ -8,6 +8,7 @@
 #include "ActionSystem/RogueActionSystemComponent.h"
 #include "ActionSystem/RogueAttributeSet.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
+#include "Core/RogueGameInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 
@@ -16,6 +17,8 @@ ARogueAICharacter::ARogueAICharacter()
 {
 	ActionSystemComponent = CreateDefaultSubobject<URogueActionSystemComponent>(TEXT("ActionSystemComp"));
 	ActionSystemComponent->SetDefaultAttributeSet(URogueMonsterAttributeSet::StaticClass());
+	
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ARogueAICharacter::PostInitializeComponents()
@@ -27,6 +30,23 @@ void ARogueAICharacter::PostInitializeComponents()
 	ActionSystemComponent->GetAttributeListener(SharedGameplayTags::Attribute_Health).AddUObject(this, &ThisClass::OnHealthChanged);
 	
 	ActionSystemComponent->OnGameplayTagsCountUpdate.AddDynamic(this, &ThisClass::OnGameplayTagsCountUpdate);
+}
+
+void ARogueAICharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	URogueGameInstance* GI = GetGameInstance<URogueGameInstance>();
+	check(GI);
+	GI->AliveMonsters.Add(this);
+}
+
+void ARogueAICharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	URogueGameInstance* GI = GetGameInstance<URogueGameInstance>();
+	GI->AliveMonsters.RemoveSingleSwap(this);
 }
 
 void ARogueAICharacter::OnGameplayTagsCountUpdate(FGameplayTag UpdatedTag, int32 NewCount)
@@ -87,5 +107,11 @@ float ARogueAICharacter::TakeDamage(float DamageAmount, struct FDamageEvent cons
 	}, 1.0f, false);
 	
 	return ActualDamage;
+}
+
+void ARogueAICharacter::SetMonsterData(URogueMonsterData* NewMonsterData)
+{
+	check(MonsterData == nullptr);
+	MonsterData = NewMonsterData;
 }
 

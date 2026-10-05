@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Core/RogueGameMode.h"
+#include "RogueGameMode.h"
 #include "RoguePrimaryGameMode.generated.h"
 
 struct FRogueDirectorData;
@@ -19,8 +19,11 @@ class ACTIONROGUELIKE5_API ARoguePrimaryGameMode : public ARogueGameMode
 	
 protected:
 	
-	UPROPERTY(EditDefaultsOnly, Category="Spawn system")
+	UPROPERTY(EditDefaultsOnly, Category="Spawn system", meta=(TitleProperty="DebugDisplayName"))
 	TArray<FRogueDirectorData> Directors;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Spawn system")
+	int32 GlobalStartingSeed{ 0 };
 	
 	void OnSpawnQueryCompleted(TSharedPtr<FEnvQueryResult> QueryResult, FMonsterSpawnData* SpawnData);
 	
@@ -29,6 +32,8 @@ protected:
 	bool TrySpawnMonster(FRogueDirectorData& Director);
 	
 public:
+
+	virtual void StartPlay() override;
 	
 	virtual void Tick(float DeltaSeconds) override;
 	

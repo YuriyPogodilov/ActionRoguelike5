@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "RogueAICharacter.generated.h"
 
+class URogueMonsterData;
 struct FGameplayTag;
 class URogueActionSystemComponent;
 
@@ -22,12 +23,26 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Death")
 	TObjectPtr<UAnimMontage> DeathMontage;
 	
+	UPROPERTY(Transient)
+	TObjectPtr<URogueMonsterData> MonsterData;
+	
 public:
+	
 	ARogueAICharacter();
 	
 	virtual void PostInitializeComponents() override;
 	
+	virtual void BeginPlay() override;
+	
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
+	URogueActionSystemComponent* GetActionSystemComponent() const { return ActionSystemComponent; }
+	
+	URogueMonsterData* GetMonsterData() const { return MonsterData; }
+	
+	void SetMonsterData(URogueMonsterData* NewMonsterData);
 	
 protected:
 	
