@@ -4,6 +4,7 @@
 #include "ActionSystem/RogueActionSystemComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Perception/AISense_Hearing.h"
 
 
 ARogueProjectileMagic::ARogueProjectileMagic()
@@ -31,6 +32,8 @@ void ARogueProjectileMagic::OnActorHit(UPrimitiveComponent* HitComponent, AActor
 			OtherActionSystemComp->GrantAction(ApplyingEffect);
 		}
 	}
+	
+	UAISense_Hearing::ReportNoiseEvent(this, GetActorLocation(), NoiseLoudness, GetInstigator(), NoiseMaxRange);
 	
 	Super::OnActorHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
 }

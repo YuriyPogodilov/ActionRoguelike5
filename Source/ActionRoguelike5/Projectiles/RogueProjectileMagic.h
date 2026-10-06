@@ -22,6 +22,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Damage")
 	float ImpulseIntensity{ 200000.0f };
 	
+	UPROPERTY(EditDefaultsOnly, Category="Noise")
+	float NoiseLoudness{ 1.0f };
+	
+	UPROPERTY(EditDefaultsOnly, Category="Noise")
+	float NoiseMaxRange{ 100.0f };
+	
 	UPROPERTY(EditDefaultsOnly, Category="Effect")
 	TSubclassOf<URogueActionEffect> ApplyingEffect;
 	
