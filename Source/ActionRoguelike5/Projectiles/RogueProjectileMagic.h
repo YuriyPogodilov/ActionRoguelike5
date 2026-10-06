@@ -17,7 +17,10 @@ class ACTIONROGUELIKE5_API ARogueProjectileMagic : public ARogueProjectile
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Damage")
-	TSubclassOf<UDamageType> DmgTypeClass;
+	float AttackDamage{ 51.0f };
+	
+	UPROPERTY(EditDefaultsOnly, Category="Damage")
+	float ImpulseIntensity{ 200000.0f };
 	
 	UPROPERTY(EditDefaultsOnly, Category="Effect")
 	TSubclassOf<URogueActionEffect> ApplyingEffect;

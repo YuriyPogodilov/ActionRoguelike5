@@ -8,6 +8,7 @@
 #include "ActionSystem/RogueActionSystemComponent.h"
 #include "ActionSystem/RogueAttributeSet.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Core/RogueGameInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
@@ -47,7 +48,7 @@ void ARogueAICharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	URogueGameInstance* GI = GetGameInstance<URogueGameInstance>();
-	GI->AliveMonsters.RemoveSingleSwap(this);
+	GI->AliveMonsters.RemoveSingleSwap(this, EAllowShrinking::No);
 }
 
 void ARogueAICharacter::OnGameplayTagsCountUpdate(FGameplayTag UpdatedTag, int32 NewCount)
@@ -74,20 +75,37 @@ void ARogueAICharacter::OnGameplayTagsCountUpdate(FGameplayTag UpdatedTag, int32
 	}
 }
 
+void ARogueAICharacter::HandleKilled()
+{
+	if (bIsDead)
+	{
+		return;
+	}
+	
+	bIsDead = true;
+	
+	URogueGameInstance* GI = GetGameInstance<URogueGameInstance>();
+	GI->AliveMonsters.RemoveSingleSwap(this, EAllowShrinking::No);
+	
+	ARogueAIController* AIController = CastChecked<ARogueAIController>(GetController());
+	AIController->GetBrainComponent()->StopLogic("Killed");
+	
+	GetMesh()->bPauseAnims = true;
+	
+	GetMesh()->SetCollisionProfileName("Ragdoll");
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	
+	GetCharacterMovement()->DisableMovement();
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	SetLifeSpan(10.0f);
+}
+
 void ARogueAICharacter::OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth)
 {
 	if (FMath::IsNearlyZero(NewHealth))
 	{
-		ARogueAIController* AIController = CastChecked<ARogueAIController>(GetController());
-		UBehaviorTreeComponent* BehaviorTreeComp = AIController->GetComponentByClass<UBehaviorTreeComponent>();
-		
-		check(BehaviorTreeComp);
-		
-		BehaviorTreeComp->StopLogic("Dead");
-		
-		GetMovementComponent()->StopMovementImmediately();
-		
-		PlayAnimMontage(DeathMontage);
+		HandleKilled();
 	}
 }
 

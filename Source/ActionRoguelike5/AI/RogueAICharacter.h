@@ -21,9 +21,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Components")
 	TObjectPtr<URogueActionSystemComponent> ActionSystemComponent;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Death")
-	TObjectPtr<UAnimMontage> DeathMontage;
-	
 	UPROPERTY(Transient)
 	TObjectPtr<URogueMonsterData> MonsterData;
 	
@@ -54,5 +51,9 @@ protected:
 	UFUNCTION()
 	void OnGameplayTagsCountUpdate(FGameplayTag UpdatedTag, int32 NewCount);
 	
+	void HandleKilled();
+	
 	FTimerHandle OverlayTimerHandle;
+	
+	bool bIsDead{ false };
 };
