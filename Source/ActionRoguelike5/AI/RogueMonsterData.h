@@ -22,4 +22,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<TSubclassOf<URogueAction>> Actions;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 CreditsReward{ 0 };
 };

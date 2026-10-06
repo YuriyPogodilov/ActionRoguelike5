@@ -27,11 +27,4 @@ void ARogueAIController::BeginPlay()
 	Super::BeginPlay();
 	
 	RunBehaviorTree(BehaviorTree);
-	
-	// FName TargetActor = "TargetActor";
-	//
-	// AActor* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	// check(PlayerPawn);
-	//
-	// GetBlackboardComponent()->SetValueAsObject(TargetActor, PlayerPawn);
 }

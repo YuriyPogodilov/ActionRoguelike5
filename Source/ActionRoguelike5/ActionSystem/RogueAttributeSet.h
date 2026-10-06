@@ -99,6 +99,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Resources")
 	FRogueAttribute RageMax;
 	
+	UPROPERTY(EditAnywhere, Category="Money")
+	FRogueAttribute Credits;
+	
 public:
 	
 	virtual void PostAttributeChanged() override;

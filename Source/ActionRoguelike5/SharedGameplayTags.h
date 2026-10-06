@@ -10,6 +10,7 @@ namespace SharedGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_RageMax)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_MoveSpeed)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_MoveSpeedMultiplier)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Credits)
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Action_PrimaryAttack)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Action_SecondaryAttack)

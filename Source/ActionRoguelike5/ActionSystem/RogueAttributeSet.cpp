@@ -59,6 +59,7 @@ URoguePlayerAttributeSet::URoguePlayerAttributeSet()
 {
 	Rage = FRogueAttribute(0.0f);
 	RageMax = FRogueAttribute(100.0f);
+	Credits = FRogueAttribute(0.0f);
 }
 
 void URoguePlayerAttributeSet::PostAttributeChanged()
@@ -66,6 +67,11 @@ void URoguePlayerAttributeSet::PostAttributeChanged()
 	Super::PostAttributeChanged();
 	
 	Rage.Base = FMath::Clamp(Rage.GetValue(), 0.0f, RageMax.GetValue());
+	
+	if (Credits.Base < 0.0f)
+	{
+		Credits.Base = 0.0f;
+	}
 }
 
 /// -------------------- RogueMonsterAttributeSet ---------------------- 

@@ -5,6 +5,8 @@
 
 #include "ActionRoguelike5.h"
 #include "EngineUtils.h"
+#include "SharedGameplayTags.h"
+#include "ActionSystem/RogueActionSystemComponent.h"
 #include "Components/AudioComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Core/RogueDeveloperSettings.h"
@@ -99,12 +101,16 @@ void URogueCoinPickupSubsystem::Tick(float DeltaTime)
 	
 	UWorld* World = GetWorld();
 	
-	FVector PlayerLocation = FVector::ZeroVector;
 	for (auto PlayerCharacter : TActorRange<ARoguePlayerCharacter>(World))
 	{
-		PlayerLocation = PlayerCharacter->GetActorLocation();
+		CheckCoinsPickupForPlayer(PlayerCharacter);
 	}
+}
 
+void URogueCoinPickupSubsystem::CheckCoinsPickupForPlayer(ARoguePlayerCharacter* PlayerCharacter)
+{
+	FVector PlayerLocation = PlayerCharacter->GetActorLocation();
+	
 	TArray<int32> ProcessList;
 	
 	const float PickupRadius = 200.f;
@@ -140,15 +146,12 @@ void URogueCoinPickupSubsystem::Tick(float DeltaTime)
 	if (TotalCoinsToGrant > 0)
 	{
 		PlayPickupSound();
-	}
+		
+		URogueActionSystemComponent* ActionComp = PlayerCharacter->GetComponentByClass<URogueActionSystemComponent>();
+		check(ActionComp);
 	
-#if 0
-	// @todo: grant coins to player
-	UE_CLOG(TotalCoinsToGrant > 0, LogGame, Log, TEXT("Picked up Coins amount = %d"), TotalCoinsToGrant);
-
-	for (int i = 0; i < CoinLocations.Num(); ++i)
-	{
-		DrawDebugPoint(World, CoinLocations[i], 8.0f, FColor::White);
+		ActionComp->ApplyAttributeChange(SharedGameplayTags::Attribute_Credits, TotalCoinsToGrant, EAttributeModifyType::Base);
+		
+		UE_LOG(LogGame, Log, TEXT("Picked up Coins amount = %d"), TotalCoinsToGrant);
 	}
-#endif
 }

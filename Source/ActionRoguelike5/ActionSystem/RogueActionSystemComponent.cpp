@@ -235,7 +235,8 @@ void URogueActionSystemComponent::ApplyAttributeChange(FGameplayTag AttributeTag
 		}
 	}
 	
-	UE_LOGFMT(LogGame, Log, "Changed Attribute: {0}, New: {1}, Old: {2}",
+	UE_LOGFMT(LogGame, Log, "Changed {0}'s Attribute: {1}, New: {2}, Old: {3}",
+		GetNameSafe(GetOwner()),
 		AttributeTag.ToString(),
 		FoundAttribute->GetValue(),
 		OldValue

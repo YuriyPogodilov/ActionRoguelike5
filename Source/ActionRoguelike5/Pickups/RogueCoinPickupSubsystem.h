@@ -6,6 +6,7 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "RogueCoinPickupSubsystem.generated.h"
 
+class ARoguePlayerCharacter;
 /**
  * 
  */
@@ -31,6 +32,8 @@ protected:
 	void OnPickupMeshLoadComplete(const FSoftObjectPath& SoftObjectPath, UObject* LoadedObject);
 	
 	void OnPickupSoundLoadComplete(const FSoftObjectPath& SoftObjectPath, UObject* LoadedObject);
+	
+	void CheckCoinsPickupForPlayer(ARoguePlayerCharacter* PlayerCharacter);
 	
 	void PlayPickupSound();
 	

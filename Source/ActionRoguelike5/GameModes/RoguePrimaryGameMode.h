@@ -31,6 +31,8 @@ protected:
 	
 	bool TrySpawnMonster(FRogueDirectorData& Director);
 	
+	void SpawnCoinsAtLocation(const FVector& LocationToSpawnAt, int32 CreditsAmount);
+	
 public:
 
 	virtual void StartPlay() override;
