@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "GameplayTagContainer.h"
+#include "RogueGameTypes.h"
 #include "SharedGameplayTags.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -123,4 +124,9 @@ void ARoguePlayerCharacter::StartAction(FGameplayTag InActionName)
 void ARoguePlayerCharacter::StopAction(FGameplayTag InActionName)
 {
 	ActionSystemComponent->StopAction(InActionName);
+}
+
+FGenericTeamId ARoguePlayerCharacter::GetGenericTeamId() const
+{
+	return FGenericTeamId(TEAM_ID_PLAYERS);
 }

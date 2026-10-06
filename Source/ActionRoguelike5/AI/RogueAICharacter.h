@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericTeamAgentInterface.h"
 #include "GameFramework/Character.h"
 #include "RogueAICharacter.generated.h"
 
@@ -11,7 +12,7 @@ struct FGameplayTag;
 class URogueActionSystemComponent;
 
 UCLASS(Abstract)
-class ACTIONROGUELIKE5_API ARogueAICharacter : public ACharacter
+class ACTIONROGUELIKE5_API ARogueAICharacter : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -43,6 +44,8 @@ public:
 	URogueMonsterData* GetMonsterData() const { return MonsterData; }
 	
 	void SetMonsterData(URogueMonsterData* NewMonsterData);
+	
+	virtual FGenericTeamId GetGenericTeamId() const override;
 	
 protected:
 	

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericTeamAgentInterface.h"
 #include "GameFramework/Character.h"
 
 #include "RoguePlayerCharacter.generated.h"
@@ -18,7 +19,7 @@ class UAnimMontage;
 class USoundBase;
 
 UCLASS()
-class ACTIONROGUELIKE5_API ARoguePlayerCharacter : public ACharacter
+class ACTIONROGUELIKE5_API ARoguePlayerCharacter : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -75,6 +76,8 @@ public:
 	void StopAction(FGameplayTag InActionName);
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	virtual FGenericTeamId GetGenericTeamId() const override;
 	
 protected:
 	

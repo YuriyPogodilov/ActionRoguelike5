@@ -7,6 +7,9 @@
 #define COLLISION_INTERACTION ECC_GameTraceChannel1
 #define COLLISION_PROJECTILE ECC_GameTraceChannel2
 
+#define TEAM_ID_PLAYERS 1
+#define TEAM_ID_BOTS 2
+
 class URogueMonsterData;
 class UEnvQuery;
 class ARogueAICharacter;

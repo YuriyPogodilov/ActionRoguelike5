@@ -3,12 +3,23 @@
 
 #include "RogueAIController.h"
 
+#include "RogueGameTypes.h"
 #include "Kismet/GameplayStatics.h"
+#include "Perception/AIPerceptionComponent.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 
 
 ARogueAIController::ARogueAIController()
 {
+	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComp"));
+}
+
+void ARogueAIController::PreRegisterAllComponents()
+{
+	Super::PreRegisterAllComponents();
+	
+	// Need to be super early before pawn is registered or perception system might have the wrong teamId
+	SetGenericTeamId(FGenericTeamId(TEAM_ID_BOTS));
 }
 
 void ARogueAIController::BeginPlay()
@@ -17,10 +28,10 @@ void ARogueAIController::BeginPlay()
 	
 	RunBehaviorTree(BehaviorTree);
 	
-	FName TargetActor = "TargetActor";
-	
-	AActor* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	check(PlayerPawn);
-	
-	GetBlackboardComponent()->SetValueAsObject(TargetActor, PlayerPawn);
+	// FName TargetActor = "TargetActor";
+	//
+	// AActor* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	// check(PlayerPawn);
+	//
+	// GetBlackboardComponent()->SetValueAsObject(TargetActor, PlayerPawn);
 }

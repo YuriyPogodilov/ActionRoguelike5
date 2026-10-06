@@ -16,7 +16,7 @@
 
 TAutoConsoleVariable<bool> CVarGameBotSpawningEnabled(
 	TEXT("game.BotSpawningEnabled"),
-	true,
+	false,
 	TEXT("Allow disabling of bot spawning for debugging purposes."),
 	ECVF_Cheat);
 

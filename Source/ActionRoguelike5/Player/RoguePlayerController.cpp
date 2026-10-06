@@ -4,6 +4,7 @@
 #include "RoguePlayerController.h"
 
 #include "EnhancedInputComponent.h"
+#include "RogueGameTypes.h"
 #include "RogueInteractionComponent.h"
 
 ARoguePlayerController::ARoguePlayerController()
@@ -22,5 +23,10 @@ void ARoguePlayerController::SetupInputComponent()
 void ARoguePlayerController::StartInteract()
 {
 	InteractionComponent->Interact();
+}
+
+FGenericTeamId ARoguePlayerController::GetGenericTeamId() const
+{
+	return FGenericTeamId(TEAM_ID_PLAYERS);
 }
 

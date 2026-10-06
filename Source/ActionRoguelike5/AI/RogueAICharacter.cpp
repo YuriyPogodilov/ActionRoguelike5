@@ -11,6 +11,7 @@
 #include "Core/RogueGameInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Perception/AISense_Damage.h"
 
 
 ARogueAICharacter::ARogueAICharacter()
@@ -94,6 +95,15 @@ float ARogueAICharacter::TakeDamage(float DamageAmount, struct FDamageEvent cons
 {
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
+	if (IsValid(EventInstigator))
+	{
+		if (GetTeamAttitudeTowards(*EventInstigator) == ETeamAttitude::Hostile)
+		{
+			UAISense_Damage::ReportDamageEvent(this, this, EventInstigator->GetPawn(), 
+				ActualDamage, EventInstigator->GetPawn()->GetActorLocation(), GetActorLocation());
+		}
+	}
+	
 	ActionSystemComponent->ApplyAttributeChange(SharedGameplayTags::Attribute_Health, -DamageAmount, EAttributeModifyType::Base);
 	
 	// HitFlash
@@ -113,5 +123,15 @@ void ARogueAICharacter::SetMonsterData(URogueMonsterData* NewMonsterData)
 {
 	check(MonsterData == nullptr);
 	MonsterData = NewMonsterData;
+}
+
+FGenericTeamId ARogueAICharacter::GetGenericTeamId() const
+{
+	if (AAIController* AIC = GetController<AAIController>())
+	{
+		return AIC->GetGenericTeamId();
+	}
+	
+	return FGenericTeamId::NoTeam;
 }
 

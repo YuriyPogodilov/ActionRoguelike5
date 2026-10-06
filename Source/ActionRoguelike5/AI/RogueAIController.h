@@ -13,12 +13,17 @@ class ACTIONROGUELIKE5_API ARogueAIController : public AAIController
 {
 	GENERATED_BODY()
 
-public:
-	ARogueAIController();
-
 protected:
-	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditDefaultsOnly, Category="AI")
 	TObjectPtr<UBehaviorTree> BehaviorTree;
+	
+	
+	virtual void BeginPlay() override;
+	
+public:
+	
+	ARogueAIController();
+	
+	virtual void PreRegisterAllComponents() override;
 };
