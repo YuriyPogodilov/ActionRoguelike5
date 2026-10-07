@@ -4,9 +4,7 @@
 #include "RoguePrimaryGameMode.h"
 
 #include "ActionRoguelike5.h"
-#include "NavigationSystem.h"
 #include "RogueGameTypes.h"
-#include "SharedGameplayTags.h"
 #include "ActionSystem/RogueActionSystemComponent.h"
 #include "AI/RogueAICharacter.h"
 #include "AI/RogueMonsterData.h"
@@ -14,7 +12,6 @@
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "Kismet/GameplayStatics.h"
-#include "Pickups/RogueCoinPickupSubsystem.h"
 
 
 TAutoConsoleVariable<bool> CVarGameBotSpawningEnabled(
@@ -163,61 +160,8 @@ void ARoguePrimaryGameMode::OnMonsterClassLoaded(const FSoftObjectPath& LoadedOb
 		{
 			ActionComp->GrantAction(ActionClass);
 		}
-		
-		ActionComp->GetAttributeListener(SharedGameplayTags::Attribute_Health).AddLambda(
-			[this, SpawnData, NewMonster](FGameplayTag UpdatedTag, float NewValue, float OldValue)
-			{
-				if (FMath::IsNearlyZero(NewValue) && OldValue > 0.0f)
-				{
-					int32 CreditsToDrop = SpawnData->MonsterData->CreditsReward;
-					SpawnCoinsAtLocation(NewMonster->GetActorLocation(), CreditsToDrop);
-				}
-			});
 	}
 	
 	UE_VLOG_SPHERE(this, LogGameMode, Log, SpawnLocation, 32.0f, FColor::Blue, TEXT("Monster type:%s\nCost:%.2f"),
 		*GetNameSafe(MonsterData->MonsterClass), SpawnData->SpawnCost);
-}
-
-void ARoguePrimaryGameMode::SpawnCoinsAtLocation(const FVector& LocationToSpawnAt, int32 CreditsAmount)
-{
-	TArray<FVector> CoinLocations;
-	TArray<int32> CoinAmounts;
-
-	int32 CreditsToGive = 0;
-	while (CreditsAmount > CreditsToGive)
-	{
-		int32 MinCreditsAmountInCoin = 1;
-		int32 MaxCreditsAmountInCoin = 10;
-		
-		int32 NewAmount = FMath::RandRange(MinCreditsAmountInCoin, MaxCreditsAmountInCoin);
-		
-		if (CreditsToGive + NewAmount > CreditsAmount)
-		{
-			NewAmount -= CreditsToGive + NewAmount - CreditsAmount;
-		}
-		
-		CreditsToGive += NewAmount;
-		CoinAmounts.Add(NewAmount);
-	}
-
-	int32 ControlSum = 0;
-	for (int i = 0; i < CoinAmounts.Num(); ++i)
-	{
-		ControlSum += CoinAmounts[i];
-	}
-	ensure(ControlSum == CreditsAmount);
-
-	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(this);
-	
-	for (int i = 0; i < CoinAmounts.Num(); ++i)
-	{
-		FNavLocation NavLocation;
-		NavSystem->GetRandomPointInNavigableRadius(LocationToSpawnAt, 512.0f, NavLocation);
-		
-		CoinLocations.Add(NavLocation.Location);
-	}
-	
-	URogueCoinPickupSubsystem* CoinSystem = GetWorld()->GetSubsystem<URogueCoinPickupSubsystem>();
-	CoinSystem->AddCoinPickups(CoinLocations, CoinAmounts);
 }

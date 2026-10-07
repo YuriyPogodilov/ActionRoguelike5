@@ -27,6 +27,8 @@ public:
 	
 	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(RogueCoinPickupSubsystem, STATGROUP_Tickables); }
 	
+	void SpawnCoinsAtLocation(const FVector& LocationToSpawnAt, int32 CreditsAmount);
+	
 protected:
 	
 	void OnPickupMeshLoadComplete(const FSoftObjectPath& SoftObjectPath, UObject* LoadedObject);

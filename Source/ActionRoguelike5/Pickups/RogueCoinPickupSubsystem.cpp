@@ -5,6 +5,7 @@
 
 #include "ActionRoguelike5.h"
 #include "EngineUtils.h"
+#include "NavigationSystem.h"
 #include "SharedGameplayTags.h"
 #include "ActionSystem/RogueActionSystemComponent.h"
 #include "Components/AudioComponent.h"
@@ -99,9 +100,7 @@ void URogueCoinPickupSubsystem::Tick(float DeltaTime)
 	
 	TRACE_CPUPROFILER_EVENT_SCOPE(CoinPickupSubsystem::Tick)
 	
-	UWorld* World = GetWorld();
-	
-	for (auto PlayerCharacter : TActorRange<ARoguePlayerCharacter>(World))
+	for (auto PlayerCharacter : TActorRange<ARoguePlayerCharacter>(GetWorld()))
 	{
 		CheckCoinsPickupForPlayer(PlayerCharacter);
 	}
@@ -154,4 +153,46 @@ void URogueCoinPickupSubsystem::CheckCoinsPickupForPlayer(ARoguePlayerCharacter*
 		
 		UE_LOG(LogGame, Log, TEXT("Picked up Coins amount = %d"), TotalCoinsToGrant);
 	}
+}
+
+void URogueCoinPickupSubsystem::SpawnCoinsAtLocation(const FVector& LocationToSpawnAt, int32 CreditsAmount)
+{
+	TArray<FVector> NewCoinLocations;
+	TArray<int32> NewCoinAmounts;
+
+	int32 CreditsToGive = 0;
+	while (CreditsAmount > CreditsToGive)
+	{
+		int32 MinCreditsAmountInCoin = 1;
+		int32 MaxCreditsAmountInCoin = 10;
+		
+		int32 NewAmount = FMath::RandRange(MinCreditsAmountInCoin, MaxCreditsAmountInCoin);
+		
+		if (CreditsToGive + NewAmount > CreditsAmount)
+		{
+			NewAmount -= CreditsToGive + NewAmount - CreditsAmount;
+		}
+		
+		CreditsToGive += NewAmount;
+		NewCoinAmounts.Add(NewAmount);
+	}
+
+	int32 ControlSum = 0;
+	for (int i = 0; i < NewCoinAmounts.Num(); ++i)
+	{
+		ControlSum += NewCoinAmounts[i];
+	}
+	ensure(ControlSum == CreditsAmount);
+
+	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(this);
+	
+	for (int i = 0; i < NewCoinAmounts.Num(); ++i)
+	{
+		FNavLocation NavLocation;
+		NavSystem->GetRandomPointInNavigableRadius(LocationToSpawnAt, 512.0f, NavLocation);
+		
+		NewCoinLocations.Add(NavLocation.Location);
+	}
+	
+	AddCoinPickups(NewCoinLocations, NewCoinAmounts);
 }

@@ -4,6 +4,7 @@
 #include "RogueAICharacter.h"
 
 #include "RogueAIController.h"
+#include "RogueMonsterData.h"
 #include "SharedGameplayTags.h"
 #include "ActionSystem/RogueActionSystemComponent.h"
 #include "ActionSystem/RogueAttributeSet.h"
@@ -13,6 +14,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Perception/AISense_Damage.h"
+#include "Pickups/RogueCoinPickupSubsystem.h"
 
 
 ARogueAICharacter::ARogueAICharacter()
@@ -99,6 +101,12 @@ void ARogueAICharacter::HandleKilled()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	SetLifeSpan(10.0f);
+	
+	if (ensure(MonsterData) && MonsterData->CreditsReward > 0.0f)
+	{
+		URogueCoinPickupSubsystem* CoinPickupSubsystem = GetWorld()->GetSubsystem<URogueCoinPickupSubsystem>();
+		CoinPickupSubsystem->SpawnCoinsAtLocation(GetActorLocation(), MonsterData->CreditsReward);
+	}
 }
 
 void ARogueAICharacter::OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth)
