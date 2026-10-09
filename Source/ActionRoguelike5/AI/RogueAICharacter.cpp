@@ -102,11 +102,14 @@ void ARogueAICharacter::HandleKilled()
 	
 	SetLifeSpan(10.0f);
 	
-	if (ensure(MonsterData) && MonsterData->CreditsReward > 0.0f)
+	int32 CreditsToReward = 10;
+	if (MonsterData && MonsterData->CreditsReward > 0)
 	{
-		URogueCoinPickupSubsystem* CoinPickupSubsystem = GetWorld()->GetSubsystem<URogueCoinPickupSubsystem>();
-		CoinPickupSubsystem->SpawnCoinsAtLocation(GetActorLocation(), MonsterData->CreditsReward);
+		CreditsToReward = MonsterData->CreditsReward;
 	}
+	
+	URogueCoinPickupSubsystem* CoinPickupSubsystem = GetWorld()->GetSubsystem<URogueCoinPickupSubsystem>();
+	CoinPickupSubsystem->SpawnCoinsAtLocation(GetActorLocation(), CreditsToReward);
 }
 
 void ARogueAICharacter::OnHealthChanged(FGameplayTag AttributeTag, float NewHealth, float OldHealth)

@@ -26,6 +26,11 @@ TAutoConsoleVariable<int32> CVarGameBotLimit(
 	TEXT("Define the maximum number of alive bots in the world."),
 	ECVF_Default);
 
+TAutoConsoleVariable<bool> CVarGameBotSpawnDirectorShowDebugInfo(
+	TEXT("game.BotSpawnDirectorShowDebugInfo"),
+	false,
+	TEXT("Define the maximum number of alive bots in the world."),
+	ECVF_Cheat);
 
 ARoguePrimaryGameMode::ARoguePrimaryGameMode()
 {
@@ -65,9 +70,12 @@ void ARoguePrimaryGameMode::Tick(float DeltaSeconds)
 		float CreditPerSecond = Director.CreditGainCurve.GetRichCurve()->Eval(TotalElapsedTime);
 		Director.CurrentCredits += CreditPerSecond * DeltaSeconds;
 		
-		FString DebugMsg = FString::Printf(TEXT("%s\nCurrent Credits: %.2f\nNextTickTime: %.2f"), *Director.DebugDisplayName, Director.CurrentCredits, Director.NextTickTime);
-		GEngine->AddOnScreenDebugMessage(KeyID, PrimaryActorTick.TickInterval, Director.DebugColor, DebugMsg);
-		KeyID++;
+		if (CVarGameBotSpawnDirectorShowDebugInfo.GetValueOnGameThread())
+		{
+			FString DebugMsg = FString::Printf(TEXT("%s\nCurrent Credits: %.2f\nNextTickTime: %.2f"), *Director.DebugDisplayName, Director.CurrentCredits, Director.NextTickTime);
+			GEngine->AddOnScreenDebugMessage(KeyID, PrimaryActorTick.TickInterval, Director.DebugColor, DebugMsg);
+			KeyID++;
+		}
 		
 		if (Director.NextTickTime > TotalElapsedTime)
 		{
@@ -124,7 +132,7 @@ bool ARoguePrimaryGameMode::TrySpawnMonster(FRogueDirectorData& Director)
 	FQueryFinishedSignature CompletedDelegate = FQueryFinishedSignature::CreateUObject(this, &ThisClass::OnSpawnQueryCompleted, SelectedRow);
 	
 	FEnvQueryRequest Request(Director.SpawnLocationQuery, this);
-	int32 QueryIndex = Request.Execute(EEnvQueryRunMode::SingleResult, CompletedDelegate);
+	int32 QueryIndex = Request.Execute(EEnvQueryRunMode::RandomBest5Pct, CompletedDelegate);
 	
 	return QueryIndex != INDEX_NONE;
 }

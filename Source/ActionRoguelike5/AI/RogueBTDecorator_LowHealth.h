@@ -17,7 +17,7 @@ class ACTIONROGUELIKE5_API URogueBTDecorator_LowHealth : public UBTDecorator
 protected:
 	
 	UPROPERTY(EditAnywhere, Category="AI")
-	float LowHealthThreshHold { 0.3f };
+	float LowHealthThreshHold { 0.5f };
 	
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 };
